@@ -66,10 +66,13 @@ ExportedObj/
 *.booproj
 *.svd
 *.pdb
-
+*.prefab
+*.wav
+*.ttf
+*.obj
 *.meta
 *.png
-
+*.tif
 *.fbx
 
 # Unity3D generated meta files
