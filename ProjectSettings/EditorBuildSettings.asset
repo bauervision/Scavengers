@@ -8,7 +8,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Isle of Noob.unity
     guid: d91e91b9ba482ca40b546f494c2a1e46
-  - enabled: 0
-    path: Assets/Scenes/TestClean.unity
-    guid: 0a94a84a0c7654347bc78ed9b7270da6
   m_configObjects: {}

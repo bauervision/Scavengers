@@ -41,6 +41,7 @@ Assets/SimpleLOD
 Assets/Standard Assets
 Assets/Tayx
 Assets/InstantOC
+Assets/Prefab Brush
 
 Lightmap*
 
@@ -74,6 +75,10 @@ ExportedObj/
 *.png
 *.tif
 *.fbx
+*.asset
+*.flare
+*.psd
+*.mat
 
 # Unity3D generated meta files
 *.pidb.meta

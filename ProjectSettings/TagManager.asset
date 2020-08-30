@@ -36,6 +36,13 @@ TagManager:
   - PW - Nature
   - Synty Medium Farm
   - Synty Small Farm
+  - Coin
+  - Gem
+  - DropZone
+  - Potion
+  - Jug
+  - InteractionManager
+  - Bonus
   layers:
   - Default
   - TransparentFX
@@ -54,7 +61,7 @@ TagManager:
   - HeadTrack
   - BodyPart
   - BlockAIRayCast
-  - 
+  - Halo
   - 
   - 
   - 

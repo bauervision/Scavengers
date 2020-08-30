@@ -9,7 +9,19 @@ public class p_StepOn : MonoBehaviour
 
     public GameObject affectedObject;
 
+    private Animator anim;
+
     private bool isOn = false;
+
+    private void Awake()
+    {
+        anim = affectedObject.GetComponent<Animator>();
+    }
+    private void Start()
+    {
+        anim.enabled = false;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -29,15 +41,24 @@ public class p_StepOn : MonoBehaviour
     {
         if (isOn)
         {
-            if (transform.localPosition.y > downPosition)
+            // if we don't have an animation clip loaded, then do simple transform animation
+            if (anim == null)
             {
-                // Move the object upward in world space 1 unit/second.
-                transform.Translate(Vector3.down * (Time.deltaTime * movementSpeed), Space.World);
-            }
-            else
-            {
-                affectedObject.GetComponent<AnimatedObject>().isAnimating = true;
+                if (transform.localPosition.y > downPosition)
+                {
+                    // Move the object upward in world space 1 unit/second.
+                    transform.Translate(Vector3.down * (Time.deltaTime * movementSpeed), Space.World);
+                }
+                else
+                {
+                    affectedObject.GetComponent<AnimatedObject>().isAnimating = true;
 
+                }
+                // TODO code up the other possible transforms
+            }
+            else// otherwise play the animation
+            {
+                anim.enabled = true;
             }
         }
     }

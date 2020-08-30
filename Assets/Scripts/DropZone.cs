@@ -12,9 +12,4 @@ public class DropZone : MonoBehaviour
         Instantiate(redBall, transform.position, transform.rotation);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

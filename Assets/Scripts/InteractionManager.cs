@@ -108,10 +108,14 @@ public class InteractionManager : MonoBehaviour
     private void Awake()
     {
         // handle testing
-        testCharacter = GameObject.Find("Miles");
-        testCharacter.SetActive(isDevelopmentTest);
-        testController = GameObject.Find("devGameController");
-        testController.SetActive(isDevelopmentTest);
+        if (isDevelopmentTest)
+        {
+            testCharacter = GameObject.Find("Miles");
+            testCharacter.SetActive(isDevelopmentTest);
+            testController = GameObject.Find("devGameController");
+            testController.SetActive(isDevelopmentTest);
+        }
+
 
         // grab all cameras
         gameCamera = GameObject.Find("vThirdPersonCamera").GetComponent<Camera>();
@@ -344,21 +348,12 @@ public class InteractionManager : MonoBehaviour
         coinList = GameObject.FindGameObjectsWithTag("Coin");
         gemList = GameObject.FindGameObjectsWithTag("Gem");
 
-        if (!isDevelopmentTest)
-        {
-            gameCamera.transform.gameObject.SetActive(false);
-            gameCanvas.SetActive(false);
-            //mobileCanvas.SetActive(false);
 
-        }
-        else
-        {
-            // if we are in development mode so hide the initial canvas and be sure not to disable
-            // the test controller
-            uiCamera.transform.gameObject.SetActive(false);
-            initialCanvas.SetActive(false);
-        }
+        gameCanvas.SetActive(isDevelopmentTest);
+        initialCanvas.SetActive(!isDevelopmentTest);
 
+        gameCamera.transform.gameObject.SetActive(isDevelopmentTest);
+        uiCamera.transform.gameObject.SetActive(!isDevelopmentTest);
         finalCanvas.SetActive(false);
         levelCanvas.SetActive(false);
 

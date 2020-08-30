@@ -102,7 +102,7 @@ public class Item : MonoBehaviour
             // trigger item collected
             InteractionManager.SetItemFound((int)myType);
 
-            EnableThisObject(true);
+            EnableThisObject(false);
 
             // dont show the display in these cases
             if (myType != ItemType.Main && myType != ItemType.Coin)
