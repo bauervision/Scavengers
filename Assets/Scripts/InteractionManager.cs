@@ -15,6 +15,7 @@ public class InteractionManager : MonoBehaviour
     public bool canSprint = true;
     public bool hasStamina = false;
     public bool speedReduced = false;
+    public bool canDie = false;
     public bool isDevelopmentTest = false;
 
 

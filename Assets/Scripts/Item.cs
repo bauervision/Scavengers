@@ -7,9 +7,11 @@ public class Item : MonoBehaviour
     public AudioClip _audioClip;
     public GameObject _particle;
 
-    public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Paddle, Chest, Potion, Jug, Halo, Horse, Bear, Ornament, Starfish };
+    public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Paddle, Chest, Potion, Jug, Halo, Collectible };
+    public enum CollectibleType { None, Horse, Bear, Ornament, Starfish };
 
     public ItemType myType;
+    public CollectibleType myCollectible;
 
     public bool willSpin = true;
     public float SpinRate = 1.0f;
@@ -56,15 +58,59 @@ public class Item : MonoBehaviour
 
 
     }
+
+    private void HandleCollectibles()
+    {
+        if (myCollectible != CollectibleType.None)
+        {
+            // if this is a collectible, determine when to unhide it based on the players ranking
+            bool showCollectible = false;
+            int playerRanking = (int)ExpManager.myRanking;
+
+            switch (myCollectible)
+            {
+                case CollectibleType.Horse:// Noob
+                    {
+                        // TODO: randomly choose which one to show
+                        showCollectible = true;// always show the initial collectible
+                        break;
+                    }
+                case CollectibleType.Bear://Spotter
+                    {
+                        showCollectible = playerRanking > 2;
+                        break;
+                    }
+                case CollectibleType.Starfish:// Finder
+                    {
+                        showCollectible = playerRanking > 5;
+                        break;
+                    }
+                case CollectibleType.Ornament://Gatherer
+                    {
+                        showCollectible = playerRanking > 8;
+                        break;
+                    }
+            }
+
+
+            EnableThisObject(showCollectible);
+
+        }
+    }
     void Start()
     {
         // locate required items
         _audioSource = GetComponent<AudioSource>();
 
-        // hide this item by default if one of these categories
+        // hide this item by default if one of these basic categories
         if (myType == ItemType.Potion || myType == ItemType.Jug || myType == ItemType.Halo)
         {
             EnableThisObject(false);
+        }
+        else
+        {
+            // hide by default based on loaded player ranking
+            HandleCollectibles();
         }
     }
 
@@ -109,13 +155,20 @@ public class Item : MonoBehaviour
             {
                 HandleMessageDisplay();
             }
-            else
+            else if (myType == ItemType.Gem || myType == ItemType.Coin)
             {
-                Destroy(gameObject, _audioClip.length);
+                // instead of destroying, begin timer so we can make it reappear
+                //Destroy(gameObject, _audioClip.length);
+                StartCoroutine(ReplaceItem());
             }
         }
     }
 
+    IEnumerator ReplaceItem()
+    {
+        yield return new WaitForSeconds(120f);
+        EnableThisObject(true);
+    }
 
 
     IEnumerator Fade()
@@ -185,6 +238,10 @@ public class Item : MonoBehaviour
             var spinAmount = (SpinRate * 50) * Time.deltaTime;
             transform.Rotate(SpinX ? spinAmount : 0, SpinY ? spinAmount : 0, SpinZ ? spinAmount : 0);
         }
+
+        // monitor always
+        HandleCollectibles();
+
     }
 }
 

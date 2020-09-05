@@ -8,7 +8,7 @@ public class ExpManager : MonoBehaviour
     private Text XpText;
     private int xp;
     private int nextLevel;
-    enum Ranking
+    public enum Ranking
     {
         Noob, // 0
         Pro,// 5000
@@ -125,7 +125,7 @@ public class ExpManager : MonoBehaviour
         50000000,
         100000000
     };
-    private Ranking myRanking;
+    public static Ranking myRanking;
 
 
     private void Awake()

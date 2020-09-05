@@ -19,7 +19,8 @@ public class p_StepOn : MonoBehaviour
     }
     private void Start()
     {
-        anim.enabled = false;
+        if (anim != null)
+            anim.enabled = false;
     }
 
     void OnTriggerEnter(Collider other)
