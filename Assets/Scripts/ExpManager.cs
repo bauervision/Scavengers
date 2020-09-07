@@ -145,7 +145,7 @@ public class ExpManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.X))
+        if (ControlFreak2.CF2Input.GetKeyUp(KeyCode.X))
             UpdateXP(500);
 
         MonitorRanking();

@@ -456,8 +456,8 @@ public class InteractionManager : MonoBehaviour
         instance.gameController.GetComponent<Invector.vGameController>().enabled = false;
         instance.uiCamera.transform.gameObject.SetActive(true);
         instance.gameCamera.transform.gameObject.SetActive(false);
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+        ControlFreak2.CFCursor.visible = true;
+        ControlFreak2.CFCursor.lockState = CursorLockMode.None;
         // perform tally calculations
         instance.CalculateLevelPoints();
 
@@ -551,7 +551,7 @@ public class InteractionManager : MonoBehaviour
     {
 
         GoodieBagStamina.SetActive(hasStamina);
-        if (Input.GetKey("escape"))
+        if (ControlFreak2.CF2Input.GetKey(KeyCode.Escape))
         {
             ReturnToLaunch();
         }
@@ -559,7 +559,7 @@ public class InteractionManager : MonoBehaviour
         GemText.text = instance.levelGemCount.ToString() + " / " + gemList.Length;
         CoinText.text = instance.levelCoinCount.ToString() + " / " + coinList.Length;
 
-        if (Input.GetKey(KeyCode.P))
+        if (ControlFreak2.CF2Input.GetKey(KeyCode.P))
         {
             SetPoisoned(true);
         }
