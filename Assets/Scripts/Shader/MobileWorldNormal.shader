@@ -10,6 +10,8 @@ Shader "BauerVision/MobileWorldNormal" {
         _TopIntensity ("Top Intensity", Range(0,1)) = 0.0 //0.7 def
         _TopColor ("Top Color", Color) = (1,0.894,0.710,1.0) //orange
         _TintColor("Tint Color", Color) = (1.000000,1.000000,1.000000,1.000000)
+        _TintLevel ("Tint Level", Range(0,1)) = 0.0 //0.7 def
+        //_ShadowColor ("Shadow Color", Color) = (1,0.894,0.710,1.0) //orange
         
     }
     SubShader {
@@ -28,6 +30,8 @@ Shader "BauerVision/MobileWorldNormal" {
         float _TopIntensity;
        	float4 _TopColor;
         float4 _TintColor;
+        float _TintLevel;
+        //float4 _ShadowColor;
        
  
         struct Input {
@@ -43,6 +47,21 @@ Shader "BauerVision/MobileWorldNormal" {
             float3 sn = mul((float3x3)unity_WorldToObject, snormal).xyz;
  
         }
+
+        
+//     half4 LightingCSLambert (SurfaceOutput s, half3 lightDir, half atten) 
+//    {
+//         fixed diff = max (0, dot (s.Normal, lightDir));
+
+//         fixed4 c;
+//         c.rgb = s.Albedo * _LightColor0.rgb * (diff * atten * 2);
+        
+//         //shadow colorization
+//         c.rgb += _ShadowColor.xyz * max(0.0,(1.0-(diff*atten*2)));
+//         c.a = s.Alpha;
+//         return c;
+//     }
+
  
         void surf (Input IN, inout SurfaceOutput o) {
             half4 color = tex2D (_MainTex, IN.uv_MainTex);
@@ -54,10 +73,10 @@ Shader "BauerVision/MobileWorldNormal" {
 
             if(dot(WorldNormalVector(IN, o.Normal), _TopDirection.xyz)>=lerp(1,-1,_TopLevel))
             {
-                o.Albedo = _TopColor   * _TintColor;
+                o.Albedo = _TopColor   * saturate(_TintColor / _TintLevel);
             }
             else {
-                o.Albedo = color.rgb  * _TintColor;
+                o.Albedo = color.rgb  * saturate(_TintColor / _TintLevel);
             }
             
         }
