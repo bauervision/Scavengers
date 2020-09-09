@@ -6,17 +6,18 @@ using UnityEngine;
 public class Launcher : MonoBehaviour
 {
     public GameObject seed;
-    private Rigidbody projectile;
-    private Transform projectileSpawnPoint;
+
+    public Transform projectileSpawnPoint;
     public float projectileVelocity;
     public float timeBetweenShots;
+    private Rigidbody projectile;
+
     private float timeBetweenShotsCounter;
     private bool canShoot;
     // Use this for initialization
     void Start()
     {
         projectile = seed.GetComponent<Rigidbody>();
-        projectileSpawnPoint = GameObject.Find("Shooter").transform;
         canShoot = false;
         timeBetweenShotsCounter = timeBetweenShots;
     }

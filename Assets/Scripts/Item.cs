@@ -1,17 +1,25 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Events;
 public class Item : MonoBehaviour
 {
     AudioSource _audioSource;
     public AudioClip _audioClip;
     public GameObject _particle;
 
-    public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Paddle, Chest, Potion, Jug, Halo, Collectible };
+    public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Chest, Potion, Jug, Halo, Shroom };
     public enum CollectibleType { None, Horse, Bear, Ornament, Starfish };
+
+    private enum MysteryType { Potion, Halo, Jug, Coins, Gems, XP };
+    private int myMysteryIndex;
+
+
+    // public UnityEvent OnPlayerEnter;
 
     public ItemType myType;
     public CollectibleType myCollectible;
+
 
     public bool willSpin = true;
     public float SpinRate = 1.0f;
@@ -33,17 +41,26 @@ public class Item : MonoBehaviour
 
     private string[] gemText = new string[] { "Sweet a gem! Nice find!", "Another gem! Way to go!", "Gems are awesome!" };
     private string[] crystalText = new string[] { "Sweet! You found one of the Mountain Crystals! There is another somewhere...", "Great! You found both Mountain Crystals!" };
-    private string[] messages = new string[]{
-    "", "", "", "", "",
-    "Hmm, I wonder if there is a boat anywhere...",
-    "A mystery chest that contained...",
-    "Your poisoning has been healed!",
-    "All stamina issues have been resolved!",
-    "You have enabled the Halo to help you locate this Mountain's blood!",
+    private string[] mysteryText = new string[] {
+        "a Potion! You feel your speed returning immediately!",
+        "Halo! Look to the skies my friend!",
+        " a Jug! No more stamina issues!",
+        "1000 coins!",
+        "200 gems!",
+        "100 XP!" };
+
+    private string[] collectibleText = new string[]{
     "A small, hand carved wooden horse!  What a rare find!",
     "A child's stuffed bear, this is incredibly rare to find, well done!",
     "A very old, delicately carved ornament of some kind, you are an excellent scavenger!",
-    "Hmm...I believe this is a starfish, we have not seen any these in decades!"
+    "Hmm...I believe this is a starfish, we have not seen any these in decades!"};
+    private string[] messages = new string[]{
+    "", "", "", "", "", "",
+    "Your poisoning has been healed!",
+    "All stamina issues have been resolved!",
+    "You have enabled the Halo to help you locate this Mountain's blood!",
+
+
 };
 
     private float fadeDuration = 2f;
@@ -57,13 +74,15 @@ public class Item : MonoBehaviour
         }
 
 
+
+
     }
 
     private void HandleCollectibles()
     {
+        // if this is a collectible, determine when to unhide it based on the players ranking
         if (myCollectible != CollectibleType.None)
         {
-            // if this is a collectible, determine when to unhide it based on the players ranking
             bool showCollectible = false;
             int playerRanking = (int)ExpManager.myRanking;
 
@@ -92,11 +111,11 @@ public class Item : MonoBehaviour
                     }
             }
 
-
             EnableThisObject(showCollectible);
 
         }
     }
+
     void Start()
     {
         // locate required items
@@ -106,6 +125,12 @@ public class Item : MonoBehaviour
         if (myType == ItemType.Potion || myType == ItemType.Jug || myType == ItemType.Halo)
         {
             EnableThisObject(false);
+        }
+        else if (myType == ItemType.Chest)
+        {
+            // if we set this as a mystery chest
+            myMysteryIndex = Random.Range(0, mysteryText.Length);
+
         }
         else
         {
@@ -129,6 +154,23 @@ public class Item : MonoBehaviour
         {
             messageText.text = crystalText[InteractionManager.instance.levelBonusItemScore - 1];
         }
+        else if (myType == ItemType.Shroom)
+        {
+            messageText.text = "Wow, a mushroom! We can spread these around and help grow something special! Be careful where you throw it though, it will only grow on good soil.";
+        }
+        else if (myType == ItemType.Chest)
+        {
+            // check to see if the player is poisoned, if they are NOT, and we drew to give a potion
+            // then push the index 1 past to not waste a potion
+            if (!InteractionManager.instance.speedReduced && myMysteryIndex == 1)
+                myMysteryIndex++;
+
+            messageText.text = $"You found a Mystery Chest which contained.....{mysteryText[myMysteryIndex]}";
+        }
+        else if (myCollectible != CollectibleType.None)
+        {
+            messageText.text = collectibleText[(int)myCollectible];
+        }
         else
         {
             messageText.text = messages[(int)myType];
@@ -145,8 +187,20 @@ public class Item : MonoBehaviour
         {
             _audioSource.PlayOneShot(_audioClip);
 
-            // trigger item collected
-            InteractionManager.SetItemFound((int)myType);
+            // if this is a collectible trigger differently
+            if (myCollectible != CollectibleType.None)
+            {
+                InteractionManager.SetItemFound((int)myCollectible, true, false);
+            }
+            else if (myType == ItemType.Chest)
+            {
+                InteractionManager.SetItemFound((int)myMysteryIndex, false, true);
+            }
+            else
+            {
+                InteractionManager.SetItemFound((int)myType, false, false);
+            }
+
 
             EnableThisObject(false);
 
@@ -161,6 +215,7 @@ public class Item : MonoBehaviour
                 //Destroy(gameObject, _audioClip.length);
                 StartCoroutine(ReplaceItem());
             }
+
         }
     }
 
@@ -214,16 +269,6 @@ public class Item : MonoBehaviour
             EnableThisObject(true);
         }
 
-        // if this is a mystery chest
-        if (myType == ItemType.Chest)
-        {
-            // randomize what is found
-        }
-        // if this is the paddle
-        if (myType == ItemType.Paddle)
-        {
-            // tip player to find the boat to go to bonus island
-        }
 
         if (myType == ItemType.Halo)
         {

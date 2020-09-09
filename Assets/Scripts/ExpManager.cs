@@ -5,8 +5,9 @@ using UnityEngine.UI;
 
 public class ExpManager : MonoBehaviour
 {
+    public ExpManager instance;
     private Text XpText;
-    private int xp;
+    public static int xp;
     private int nextLevel;
     public enum Ranking
     {
@@ -133,12 +134,13 @@ public class ExpManager : MonoBehaviour
         XpText = GameObject.Find("XpText").GetComponent<Text>();
     }
 
-    public void UpdateXP(int xpIncrease)
+    public static void UpdateXP(int xpIncrease)
     {
         xp += xpIncrease;
     }
     private void Start()
     {
+        instance = this;
         // TODO: fetch the xp from the database
         nextLevel = nextLevelPoints[(int)myRanking];
     }

@@ -24,6 +24,7 @@ public class InteractionManager : MonoBehaviour
     private GameObject testCharacter;
     private GameObject testController;
     private GameObject[] spawnLocations;
+    private GameObject[] mysteryLocations;
     private GameObject GoodieBag;
     private Text GoodieBagText;
     private Text GoodieBagUIText;
@@ -32,6 +33,7 @@ public class InteractionManager : MonoBehaviour
     private GameObject gameCanvas;
     private GameObject levelCanvas;
     private GameObject finalCanvas;
+    private GameObject mobileCanvas;
 
     private Image mainItemSprite;
     private Image bonusItem1Sprite;
@@ -68,6 +70,8 @@ public class InteractionManager : MonoBehaviour
     private GameObject[] coinList;
     private GameObject[] gemList;
 
+    private GameObject throwButton;
+
     #endregion
 
     public Sprite foundSprite;
@@ -96,6 +100,8 @@ public class InteractionManager : MonoBehaviour
     public int levelGemCount = 0;
     private int levelTotalPoints = 0;
     private int chosenDropzoneIndex = -1;
+
+    private int chosenMysteryIndex = -1;
 
     private Color OffColor = new Color(0, 0, 0, 0);
     private Color OnColor = new Color(0, 0, 0, 0.7f);
@@ -126,10 +132,14 @@ public class InteractionManager : MonoBehaviour
         gameController = GameObject.Find("vGameController");
         notifyPanel = GameObject.Find("NotifyPanel");
         finalSpecialPanel = GameObject.Find("FinalSpecialText");
+        throwButton = GameObject.Find("ShroomLauncher");
+        throwButton.SetActive(false);
 
 
         // grab all dropzones in the scene
         spawnLocations = GameObject.FindGameObjectsWithTag("DropZone");
+        // grab all mystery chests
+        mysteryLocations = GameObject.FindGameObjectsWithTag("MysteryChest");
         // grab and assign listeners to all buttons
         GoodieBag = GameObject.Find("GoodieBag");
         GoodieBag.GetComponent<Button>().onClick.AddListener(GrabGoodieBag);
@@ -156,7 +166,7 @@ public class InteractionManager : MonoBehaviour
         gameCanvas = GameObject.Find("GameCanvas");
         levelCanvas = GameObject.Find("LevelCanvas");
         finalCanvas = GameObject.Find("FinalCanvas");
-        //mobileCanvas = GameObject.Find("MobileUI_Basic");
+        mobileCanvas = GameObject.Find("CF2-Panel");
         GemText = GameObject.Find("GemTextUI").GetComponent<Text>();
         CoinText = GameObject.Find("CoinTextUI").GetComponent<Text>();
         finalTimeText = GameObject.Find("FinalTimeText").GetComponent<Text>();
@@ -256,6 +266,10 @@ public class InteractionManager : MonoBehaviour
     }
 
 
+    public void EnableThrow(bool value)
+    {
+        throwButton.SetActive(value);
+    }
     public void GrabGoodieBag()
     {
         GoodieBag.SetActive(false);
@@ -322,7 +336,7 @@ public class InteractionManager : MonoBehaviour
     {
         initialCanvas.SetActive(false);
         gameCanvas.SetActive(true);
-        //mobileCanvas.SetActive(true);
+        mobileCanvas.SetActive(true);
         uiCamera.transform.gameObject.SetActive(false);
         gameCamera.transform.gameObject.SetActive(true);
         gameController.GetComponent<Invector.vGameController>().enabled = true;
@@ -357,8 +371,11 @@ public class InteractionManager : MonoBehaviour
         uiCamera.transform.gameObject.SetActive(!isDevelopmentTest);
         finalCanvas.SetActive(false);
         levelCanvas.SetActive(false);
+        mobileCanvas.SetActive(false);
 
         SpawnItem();
+        SpawnMysteryChests();
+
         GoodieBagText.text = "";
         GoodieBagUIText.text = "";
         InitializeGoodieBagAbilities();
@@ -376,6 +393,64 @@ public class InteractionManager : MonoBehaviour
         mountainBlood.GetComponent<Item>().enabled = true;
     }
 
+    private void SpawnMysteryChests()
+    {
+        chosenMysteryIndex = Random.Range(0, mysteryLocations.Length);
+        // disable all of them first
+        foreach (GameObject chest in mysteryLocations)
+        {
+            chest.SetActive(false);
+        }
+        // now enable only the one we chose
+        mysteryLocations[chosenMysteryIndex].SetActive(true);
+    }
+
+    private void FoundMysteryChest(int itemIndex)
+    {
+
+        switch (itemIndex)
+        {
+            case 0:
+                {
+                    SetPoisoned(false);
+                    //potion
+                    break;
+                }
+            case 1:
+                {
+                    EnableHalo();
+                    //halo
+                    break;
+                }
+            case 2:
+                {
+                    hasStamina = false;
+                    //jug
+                    break;
+                }
+            case 3:
+                {
+                    //coins
+                    levelCoinCount += 1000;
+                    break;
+                }
+            case 4:
+                {
+                    //gems
+                    levelGemCount += 200;
+                    break;
+                }
+            case 5:
+                {
+                    //XP
+                    ExpManager.UpdateXP(100);
+                    break;
+                }
+        }
+        // respawn the chests
+        SpawnMysteryChests();
+
+    }
     private void FoundSpecialItem(int itemIndex)
     {
         if (!finalSpecialPanel.activeInHierarchy)
@@ -395,29 +470,47 @@ public class InteractionManager : MonoBehaviour
         specialPoints = specialPoints + bonusAmount;
         specialText.text = "Special:" + specialPoints;
     }
-    public static void SetItemFound(int itemFound)
+    public static void SetItemFound(int itemFound, bool isCollectible, bool isChest)
     {
 
-        switch (itemFound)
+        if (isCollectible)
         {
-            // main level items
-            case 0: { LevelCompleted(); break; }
-            case 1: { instance.levelBonusItemScore++; instance.bonusItem1Sprite.sprite = instance.foundSprite; instance.foundBonus1 = true; break; }
-            case 2: { instance.levelBonusItemScore++; instance.bonusItem2Sprite.sprite = instance.foundSprite; instance.foundBonus2 = true; break; }
-            // collectibles
-            case 3: { instance.levelCoinCount++; break; }
-            case 4: { instance.levelGemCount++; break; }
-            case 5: { instance.FoundSpecialItem(itemFound); break; }// found the paddle
-            case 6: { instance.FoundSpecialItem(itemFound); break; }//found the chest
-            case 7: { instance.SetPoisoned(false); break; }//potion
-            case 8: { break; }//jug
-            case 9: { instance.EnableHalo(); break; }//halo enabled
-            case 10: { instance.FoundSpecialItem(itemFound); break; } // found the horse
-            case 11: { instance.FoundSpecialItem(itemFound); break; } // found the bear
-            case 12: { instance.FoundSpecialItem(itemFound); break; } // found the ornament
-            case 13: { instance.FoundSpecialItem(itemFound); break; } // found the starfish
+            switch (itemFound)
+            {
+                case 1: { instance.FoundSpecialItem(itemFound); break; } // found the horse
+                case 2: { instance.FoundSpecialItem(itemFound); break; } // found the bear
+                case 3: { instance.FoundSpecialItem(itemFound); break; } // found the ornament
+                case 4: { instance.FoundSpecialItem(itemFound); break; } // found the starfish
+            }
+        }
+        else
+        {
+            // if this was a chest, then we need to use the itemFound differently
+            if (isChest)
+            {
+                instance.FoundMysteryChest(itemFound);
+            }
+            else
+            {
+                switch (itemFound)
+                {
+                    // main level items
+                    case 0: { LevelCompleted(); break; }
+                    case 1: { instance.levelBonusItemScore++; instance.bonusItem1Sprite.sprite = instance.foundSprite; instance.foundBonus1 = true; break; }
+                    case 2: { instance.levelBonusItemScore++; instance.bonusItem2Sprite.sprite = instance.foundSprite; instance.foundBonus2 = true; break; }
+                    // collectibles
+                    case 3: { instance.levelCoinCount++; break; }
+                    case 4: { instance.levelGemCount++; break; }
+                    //case 5: { instance.FoundMysteryChest(itemFound); break; }//found the chest
+                    case 6: { instance.SetPoisoned(false); break; }//potion
+                    case 7: { break; }//jug
+                    case 8: { instance.EnableHalo(); break; }//halo enabled
+                    case 10: { instance.EnableThrow(true); break; } // found the shroom
+                    default: { break; }
+                }
+            }
 
-            default: { break; }
+
         }
 
     }
