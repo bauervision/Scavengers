@@ -9,15 +9,19 @@ public class Item : MonoBehaviour
     public GameObject _particle;
 
     public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Chest, Potion, Jug, Halo, Shroom };
+    private int[] itemPoints = new int[] { 1000, 500, 500, 1, 5, 250, 300, 300, 750, 800 };
     public enum CollectibleType { None, Horse, Bear, Ornament, Starfish };
 
     private enum MysteryType { Potion, Halo, Jug, Coins, Gems, XP };
     private int myMysteryIndex;
 
 
+
     // public UnityEvent OnPlayerEnter;
 
     public ItemType myType;
+    public int seedCount;
+
     public CollectibleType myCollectible;
 
 
@@ -54,6 +58,13 @@ public class Item : MonoBehaviour
     "A child's stuffed bear, this is incredibly rare to find, well done!",
     "A very old, delicately carved ornament of some kind, you are an excellent scavenger!",
     "Hmm...I believe this is a starfish, we have not seen any these in decades!"};
+
+    private int[] collectiblePoints = new int[]{
+        1000,//horse
+        2500,// bear
+        5000,// ornament
+        10000,//starfish
+    };
     private string[] messages = new string[]{
     "", "", "", "", "", "",
     "Your poisoning has been healed!",
@@ -72,10 +83,6 @@ public class Item : MonoBehaviour
             messagePanelImage = GameObject.Find("NotifyPanel").GetComponent<Image>();
             messageText = GameObject.Find("NotifyText").GetComponent<Text>();
         }
-
-
-
-
     }
 
     private void HandleCollectibles()
@@ -186,23 +193,34 @@ public class Item : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             _audioSource.PlayOneShot(_audioClip);
+            EnableThisObject(false);
 
             // if this is a collectible trigger differently
             if (myCollectible != CollectibleType.None)
             {
                 InteractionManager.SetItemFound((int)myCollectible, true, false);
+                print("Collectible points" + collectiblePoints[(int)myCollectible]);
+                ExpManager.UpdateXP(collectiblePoints[(int)myCollectible - 1]);
             }
             else if (myType == ItemType.Chest)
             {
                 InteractionManager.SetItemFound((int)myMysteryIndex, false, true);
+                ExpManager.UpdateXP(itemPoints[(int)myType]);
+            }
+            else if (myType == ItemType.Shroom)
+            {// if this is a shroom, we also need to pass the number of seeds to add
+                InteractionManager.instance.currentSeedCount += seedCount;
+                InteractionManager.SetItemFound((int)myType, false, false);
+                ExpManager.UpdateXP(itemPoints[(int)myType]);
             }
             else
             {
                 InteractionManager.SetItemFound((int)myType, false, false);
+                ExpManager.UpdateXP(itemPoints[(int)myType]);
             }
 
 
-            EnableThisObject(false);
+
 
             // dont show the display in these cases
             if (myType != ItemType.Main && myType != ItemType.Coin)

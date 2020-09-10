@@ -18,9 +18,11 @@ public class InteractionManager : MonoBehaviour
     public bool canDie = false;
     public bool isDevelopmentTest = false;
 
+    public int currentSeedCount = 0;
+
 
     #region FindTheseItemsDuringAwake
-
+    private Text SeedCountText;
     private GameObject testCharacter;
     private GameObject testController;
     private GameObject[] spawnLocations;
@@ -132,14 +134,18 @@ public class InteractionManager : MonoBehaviour
         gameController = GameObject.Find("vGameController");
         notifyPanel = GameObject.Find("NotifyPanel");
         finalSpecialPanel = GameObject.Find("FinalSpecialText");
+        // set this before we disable the throw button
+        SeedCountText = GameObject.Find("SeedCount").GetComponent<Text>();
         throwButton = GameObject.Find("ShroomLauncher");
-        throwButton.SetActive(false);
+
 
 
         // grab all dropzones in the scene
         spawnLocations = GameObject.FindGameObjectsWithTag("DropZone");
+
         // grab all mystery chests
         mysteryLocations = GameObject.FindGameObjectsWithTag("MysteryChest");
+
         // grab and assign listeners to all buttons
         GoodieBag = GameObject.Find("GoodieBag");
         GoodieBag.GetComponent<Button>().onClick.AddListener(GrabGoodieBag);
@@ -151,6 +157,7 @@ public class InteractionManager : MonoBehaviour
         LevelSelectButtonFinal.GetComponent<Button>().onClick.AddListener(ShowLevelSelect);
         LoadNextLevelButton = GameObject.Find("LoadNextLevelButton").GetComponent<Button>();
         LoadNextLevelButton.GetComponent<Button>().onClick.AddListener(LoadNextLevel);
+
         // assign all item images
         mainItemSprite = GameObject.Find("MainItemSprite").GetComponent<Image>();
         bonusItem1Sprite = GameObject.Find("BonusItem1Sprite").GetComponent<Image>();
@@ -159,6 +166,7 @@ public class InteractionManager : MonoBehaviour
         finalBonusItem2Sprite = GameObject.Find("FinalBonusStar2").GetComponent<Image>();
 
         // assign all Text objects
+
         GoodieBagText = GameObject.Find("GoodieBagText").GetComponent<Text>();
         GoodieBagUIText = GameObject.Find("GoodieBagUIText").GetComponent<Text>();
         GoodieBagStamina = GameObject.Find("GoodieBagStamina");
@@ -270,6 +278,7 @@ public class InteractionManager : MonoBehaviour
     {
         throwButton.SetActive(value);
     }
+
     public void GrabGoodieBag()
     {
         GoodieBag.SetActive(false);
@@ -372,6 +381,7 @@ public class InteractionManager : MonoBehaviour
         finalCanvas.SetActive(false);
         levelCanvas.SetActive(false);
         mobileCanvas.SetActive(false);
+        throwButton.SetActive(false);
 
         SpawnItem();
         SpawnMysteryChests();
@@ -472,6 +482,7 @@ public class InteractionManager : MonoBehaviour
     }
     public static void SetItemFound(int itemFound, bool isCollectible, bool isChest)
     {
+        print("InteractionManager itemFound: " + itemFound + " isCollectible:" + isCollectible + " isChest: " + isChest);
 
         if (isCollectible)
         {
@@ -505,7 +516,7 @@ public class InteractionManager : MonoBehaviour
                     case 6: { instance.SetPoisoned(false); break; }//potion
                     case 7: { break; }//jug
                     case 8: { instance.EnableHalo(); break; }//halo enabled
-                    case 10: { instance.EnableThrow(true); break; } // found the shroom
+                    case 9: { instance.EnableThrow(true); break; } // found the shroom
                     default: { break; }
                 }
             }
@@ -649,13 +660,19 @@ public class InteractionManager : MonoBehaviour
             ReturnToLaunch();
         }
 
+        // update all Text fields accordingly
         GemText.text = instance.levelGemCount.ToString() + " / " + gemList.Length;
         CoinText.text = instance.levelCoinCount.ToString() + " / " + coinList.Length;
+        SeedCountText.text = currentSeedCount.ToString();
 
         if (ControlFreak2.CF2Input.GetKey(KeyCode.P))
         {
             SetPoisoned(true);
         }
+
+        // if we are showing the throw button and run out of seeds, hide the button
+        if (currentSeedCount < 1 && throwButton.activeInHierarchy)
+            throwButton.SetActive(false);
     }
 
 }

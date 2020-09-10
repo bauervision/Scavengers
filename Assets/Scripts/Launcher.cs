@@ -29,6 +29,7 @@ public class Launcher : MonoBehaviour
         {
             Rigidbody bulletInstance = Instantiate(projectile, projectileSpawnPoint.position, Quaternion.Euler(new Vector3(0, 0, transform.localEulerAngles.z))) as Rigidbody;
             bulletInstance.GetComponent<Rigidbody>().AddForce(projectileSpawnPoint.right * projectileVelocity);
+            InteractionManager.instance.currentSeedCount--;
             canShoot = false;
         }
         if (!canShoot)

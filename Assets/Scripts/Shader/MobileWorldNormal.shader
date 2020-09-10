@@ -19,7 +19,8 @@ Shader "BauerVision/MobileWorldNormal" {
         LOD 200
  
         CGPROGRAM
-        #pragma surface surf Lambert vertex:vert
+        #pragma surface surf Standard fullforwardshadows vertex:vert
+        #pragma target 3.0
  
         sampler2D _MainTex;
         sampler2D _TopTex;
@@ -36,15 +37,19 @@ Shader "BauerVision/MobileWorldNormal" {
  
         struct Input {
             float2 uv_MainTex;
+            float3 cameraRelativeWorldPos;
             float3 worldNormal;
             INTERNAL_DATA
         };
  
-        void vert (inout appdata_full v) {
+        void vert (inout appdata_full v, out Input o) {
             //Convert the normal to world coortinates
             float4 snow = mul(UNITY_MATRIX_IT_MV, _TopDirection);
             float3 snormal = normalize(_TopDirection.xyz);
             float3 sn = mul((float3x3)unity_WorldToObject, snormal).xyz;
+
+             UNITY_INITIALIZE_OUTPUT(Input,o);
+            o.cameraRelativeWorldPos = mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1.0)) - _WorldSpaceCameraPos.xyz;
  
         }
 
@@ -63,7 +68,7 @@ Shader "BauerVision/MobileWorldNormal" {
 //     }
 
  
-        void surf (Input IN, inout SurfaceOutput o) {
+        void surf (Input IN, inout SurfaceOutputStandard o) {
             half4 color = tex2D (_MainTex, IN.uv_MainTex);
             
             half difference2 = dot(WorldNormalVector(IN, o.Normal), _TopDirection.xyz) - lerp(1,-1,_TopLevel);
@@ -79,6 +84,17 @@ Shader "BauerVision/MobileWorldNormal" {
                 o.Albedo = color.rgb  * saturate(_TintColor / _TintLevel);
             }
             
+            // flat world normal from position derivatives
+            half3 flatWorldNormal = normalize(cross(ddy(IN.cameraRelativeWorldPos.xyz), ddx(IN.cameraRelativeWorldPos.xyz)));
+ 
+            // construct world to tangent matrix
+            half3 worldT =  WorldNormalVector(IN, half3(1,0,0));
+            half3 worldB =  WorldNormalVector(IN, half3(0,1,0));
+            half3 worldN =  WorldNormalVector(IN, half3(0,0,1));
+            half3x3 tbn = half3x3(worldT, worldB, worldN);
+ 
+            // apply world to tangent transform to flat world normal
+            o.Normal = mul(tbn, flatWorldNormal);
         }
         ENDCG
     }
