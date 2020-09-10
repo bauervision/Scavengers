@@ -5,7 +5,8 @@ using UnityEngine;
 // theflyingkeyboard.net
 public class Launcher : MonoBehaviour
 {
-    public GameObject seed;
+    public GameObject[] seedsToLaunch;
+    public static int seedIndex = 0;
 
     public Transform projectileSpawnPoint;
     public float projectileVelocity;
@@ -17,7 +18,7 @@ public class Launcher : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        projectile = seed.GetComponent<Rigidbody>();
+
         canShoot = false;
         timeBetweenShotsCounter = timeBetweenShots;
     }
@@ -27,6 +28,7 @@ public class Launcher : MonoBehaviour
     {
         if (ControlFreak2.CF2Input.GetMouseButtonDown(0) && canShoot)
         {
+            projectile = seedsToLaunch[seedIndex].GetComponent<Rigidbody>();
             Rigidbody bulletInstance = Instantiate(projectile, projectileSpawnPoint.position, Quaternion.Euler(new Vector3(0, 0, transform.localEulerAngles.z))) as Rigidbody;
             bulletInstance.GetComponent<Rigidbody>().AddForce(projectileSpawnPoint.right * projectileVelocity);
             InteractionManager.instance.currentSeedCount--;

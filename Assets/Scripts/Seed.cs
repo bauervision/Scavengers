@@ -3,6 +3,11 @@ using System.Collections;
 
 public class Seed : MonoBehaviour
 {
+    AudioSource _audioSource;
+    public AudioClip _audioClip;
+
+    public enum SeedType { Flower, Coin, Crystal, Tree, SpiderTrap };
+    public SeedType mySeedType;
     public GameObject plant;
 
     public Transform seedTransform;
@@ -14,6 +19,9 @@ public class Seed : MonoBehaviour
 
     void Start()
     {
+        // locate required items
+        _audioSource = GetComponent<AudioSource>();
+
         t = Terrain.activeTerrain;
         seedTransform = gameObject.transform;
     }
@@ -25,36 +33,62 @@ public class Seed : MonoBehaviour
             GetTerrainTexture();
     }
 
+    private void HandleSeedPlanting()
+    {
+        // plant the flower that will bloom
+        Instantiate(plant, transform.position, Quaternion.identity);
+        _audioSource.PlayOneShot(_audioClip);
+        //disable the mesh
+        gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<SphereCollider>().enabled = false;
+        // destroy the seed
+        Destroy(gameObject, _audioClip.length);
+    }
 
     public void GetTerrainTexture()
     {
         ConvertPosition(seedTransform.position);
         CheckTexture();
 
-        // if (textureValues[0] > 0)
-        // {
-        //     print("Hit Mountain Rock!");
-        // }
-        // hit soil texture
-        if (textureValues[1] > 0)
+        // check to see what type of seed we are
+        switch ((int)mySeedType)
         {
-            // plant the flower that will bloom
-            Instantiate(plant, transform.position, Quaternion.identity);
-            // destroy the seed
-            Destroy(gameObject);
+            case 0://Flower seed
+                   // hit good soil
+                if (textureValues[1] > 0)
+                    HandleSeedPlanting();
+                else
+                    StartCoroutine(WaitToDestroy());
+
+                break;
+            case 1://Coin seed
+                   // hit gravel path
+                if (textureValues[3] > 0)
+                    HandleSeedPlanting();
+                else
+                    StartCoroutine(WaitToDestroy());
+
+                break;
+            case 2://Crystal seed
+                if (textureValues[0] > 0)// hit Mountain Rock
+                    HandleSeedPlanting();
+                else
+                    StartCoroutine(WaitToDestroy());
+
+                break;
+            case 3: // Tree seed
+                if (textureValues[1] > 0)
+                    HandleSeedPlanting();
+                else
+                    StartCoroutine(WaitToDestroy());
+
+                break;
+            case 4: // SpiderTrap seed
+                HandleSeedPlanting();
+                break;
+
         }
-        else
-        {
-            StartCoroutine(WaitToDestroy());
-        }
-        // if (textureValues[2] > 0)
-        // {
-        //     print("Hit Sandy Rock!");
-        // }
-        // if (textureValues[3] > 0)
-        // {
-        //     print("Hit Gravel Path!");
-        // }
+
     }
 
     void ConvertPosition(Vector3 seedPosition)

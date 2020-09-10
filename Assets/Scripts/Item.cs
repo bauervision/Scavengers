@@ -6,7 +6,6 @@ public class Item : MonoBehaviour
 {
     AudioSource _audioSource;
     public AudioClip _audioClip;
-    public GameObject _particle;
 
     public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Chest, Potion, Jug, Halo, Shroom };
     private int[] itemPoints = new int[] { 1000, 500, 500, 1, 5, 250, 300, 300, 750, 800 };
@@ -22,6 +21,9 @@ public class Item : MonoBehaviour
     public ItemType myType;
     public int seedCount;
 
+
+    public enum SeedType { None, Flower, Coin, Crystal, Tree, SpiderTrap };
+    public SeedType myShroomType;
     public CollectibleType myCollectible;
 
 
@@ -58,6 +60,13 @@ public class Item : MonoBehaviour
     "A child's stuffed bear, this is incredibly rare to find, well done!",
     "A very old, delicately carved ornament of some kind, you are an excellent scavenger!",
     "Hmm...I believe this is a starfish, we have not seen any these in decades!"};
+
+    private string[] shroomText = new string[]{
+    "A Flower Mushroom! Spread these around and grow something beautiful!\nIt only sprouts on good soil.",
+    "A Coin Mushroom! Grow these to sprout coins!\nIt will only sprout on the gravel path",
+    "A Crystal Mushroom! These bloom into very rare gems!\nBest thrown on hard rock.",
+    "A Tree Mushroom! Very rare, but useful if you need to reach certain heights\nIt only sprouts on good soil.",
+    "A Spidertrap Mushroom! Use these to grow shrubs that no spider will pass!\nThrow it anywhere!"};
 
     private int[] collectiblePoints = new int[]{
         1000,//horse
@@ -152,7 +161,7 @@ public class Item : MonoBehaviour
         messagePanelImage.color = OnColor;
         messageText.color = TextStartColor;
 
-        //if this is a gem, pull from
+        //certain items have an array of messages to display
         if (myType == ItemType.Gem)
         {
             messageText.text = gemText[InteractionManager.instance.levelGemCount - 1];
@@ -163,7 +172,9 @@ public class Item : MonoBehaviour
         }
         else if (myType == ItemType.Shroom)
         {
-            messageText.text = "Wow, a mushroom! We can spread these around and help grow something special! Be careful where you throw it though, it will only grow on good soil.";
+            messageText.text = shroomText[(int)myShroomType - 1]; // account for the 'None' option
+            //signal to the Launcher which to seed to fire
+            Launcher.seedIndex = (int)myShroomType - 1;// again, account for 'None'
         }
         else if (myType == ItemType.Chest)
         {
@@ -208,7 +219,8 @@ public class Item : MonoBehaviour
                 ExpManager.UpdateXP(itemPoints[(int)myType]);
             }
             else if (myType == ItemType.Shroom)
-            {// if this is a shroom, we also need to pass the number of seeds to add
+            {
+                // if this is a shroom, we also need to pass the number of seeds to add
                 InteractionManager.instance.currentSeedCount += seedCount;
                 InteractionManager.SetItemFound((int)myType, false, false);
                 ExpManager.UpdateXP(itemPoints[(int)myType]);

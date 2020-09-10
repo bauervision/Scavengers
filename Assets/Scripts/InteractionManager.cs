@@ -482,7 +482,7 @@ public class InteractionManager : MonoBehaviour
     }
     public static void SetItemFound(int itemFound, bool isCollectible, bool isChest)
     {
-        print("InteractionManager itemFound: " + itemFound + " isCollectible:" + isCollectible + " isChest: " + isChest);
+        //print("InteractionManager itemFound: " + itemFound + " isCollectible:" + isCollectible + " isChest: " + isChest);
 
         if (isCollectible)
         {
@@ -673,6 +673,8 @@ public class InteractionManager : MonoBehaviour
         // if we are showing the throw button and run out of seeds, hide the button
         if (currentSeedCount < 1 && throwButton.activeInHierarchy)
             throwButton.SetActive(false);
+
+
     }
 
 }
