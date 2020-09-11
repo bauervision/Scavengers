@@ -4,11 +4,12 @@ using System.Collections;
 using UnityEngine.Events;
 public class Item : MonoBehaviour
 {
+    public static Item instance;
     AudioSource _audioSource;
     public AudioClip _audioClip;
 
-    public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Chest, Potion, Jug, Halo, Shroom };
-    private int[] itemPoints = new int[] { 1000, 500, 500, 1, 5, 250, 300, 300, 750, 800 };
+    public enum ItemType { Main, Crystal1, Crystal2, Coin, Gem, Chest, Potion, Jug, Halo, Shroom, IslandHeart };
+    private int[] itemPoints = new int[] { 1000, 500, 500, 1, 5, 250, 300, 300, 750, 800, 1000 };
     public enum CollectibleType { None, Horse, Bear, Ornament, Starfish };
 
     private enum MysteryType { Potion, Halo, Jug, Coins, Gems, XP };
@@ -34,16 +35,7 @@ public class Item : MonoBehaviour
     public bool SpinZ = true;
 
 
-    private GameObject messagePanel;
-    private Text messageText;
 
-    private Color OffColor = new Color(0, 0, 0, 0);
-    private Color OnColor = new Color(0, 0, 0, 0.7f);
-
-    private Color TextStartColor = new Color(1, 1, 1, 1);
-    private Color TextEndColor = new Color(0, 0, 0, 0);
-
-    private Image messagePanelImage;
 
     private string[] gemText = new string[] { "Sweet a gem! Nice find!", "Another gem! Way to go!", "Gems are awesome!" };
     private string[] crystalText = new string[] { "Sweet! You found one of the Mountain Crystals! There is another somewhere...", "Great! You found both Mountain Crystals!" };
@@ -56,6 +48,7 @@ public class Item : MonoBehaviour
         "100 XP!" };
 
     private string[] collectibleText = new string[]{
+    "", // none
     "A small, hand carved wooden horse!  What a rare find!",
     "A child's stuffed bear, this is incredibly rare to find, well done!",
     "A very old, delicately carved ornament of some kind, you are an excellent scavenger!",
@@ -69,6 +62,7 @@ public class Item : MonoBehaviour
     "A Spidertrap Mushroom! Use these to grow shrubs that no spider will pass!\nThrow it anywhere!"};
 
     private int[] collectiblePoints = new int[]{
+        0, // none
         1000,//horse
         2500,// bear
         5000,// ornament
@@ -84,15 +78,6 @@ public class Item : MonoBehaviour
 };
 
     private float fadeDuration = 2f;
-
-    private void Awake()
-    {
-        if (GameObject.Find("NotifyPanel") != null)
-        {
-            messagePanelImage = GameObject.Find("NotifyPanel").GetComponent<Image>();
-            messageText = GameObject.Find("NotifyText").GetComponent<Text>();
-        }
-    }
 
     private void HandleCollectibles()
     {
@@ -127,13 +112,17 @@ public class Item : MonoBehaviour
                     }
             }
 
-            EnableThisObject(showCollectible);
+            // if we determine that we need to show the model, do so only if it isnt already showing
+            if (!gameObject.activeInHierarchy)
+                EnableThisObject(showCollectible);
 
         }
     }
 
     void Start()
     {
+        instance = this;
+
         // locate required items
         _audioSource = GetComponent<AudioSource>();
 
@@ -157,22 +146,29 @@ public class Item : MonoBehaviour
 
     private void HandleMessageDisplay()
     {
-        // turn everything on
-        messagePanelImage.color = OnColor;
-        messageText.color = TextStartColor;
+        string message = "";
+        float baseDuration = 2f;
 
-        //certain items have an array of messages to display
-        if (myType == ItemType.Gem)
+        if (myType == ItemType.Main)
         {
-            messageText.text = gemText[InteractionManager.instance.levelGemCount - 1];
+            message = "Great job! Now just locate the heart of the island!";
+            Notificatons.ShowNotification(message, baseDuration);
+
+        }
+        if (myType == ItemType.Gem)//certain items have an array of messages to display
+        {
+            message = gemText[InteractionManager.instance.levelGemCount - 1];
+            Notificatons.ShowNotification(message, baseDuration);
         }
         else if (myType == ItemType.Crystal1 || myType == ItemType.Crystal2)
         {
-            messageText.text = crystalText[InteractionManager.instance.levelBonusItemScore - 1];
+            message = crystalText[InteractionManager.instance.levelBonusItemScore - 1];
+            Notificatons.ShowNotification(message, 3f);
         }
         else if (myType == ItemType.Shroom)
         {
-            messageText.text = shroomText[(int)myShroomType - 1]; // account for the 'None' option
+            message = shroomText[(int)myShroomType - 1]; // account for the 'None' option
+            Notificatons.ShowNotification(message, 4f);
             //signal to the Launcher which to seed to fire
             Launcher.seedIndex = (int)myShroomType - 1;// again, account for 'None'
         }
@@ -180,22 +176,25 @@ public class Item : MonoBehaviour
         {
             // check to see if the player is poisoned, if they are NOT, and we drew to give a potion
             // then push the index 1 past to not waste a potion
+            // TODO: not tested
             if (!InteractionManager.instance.speedReduced && myMysteryIndex == 1)
                 myMysteryIndex++;
 
-            messageText.text = $"You found a Mystery Chest which contained.....{mysteryText[myMysteryIndex]}";
+            message = $"You found a Mystery Chest which contained.....{mysteryText[myMysteryIndex]}";
+            Notificatons.ShowNotification(message, baseDuration);
         }
         else if (myCollectible != CollectibleType.None)
         {
-            messageText.text = collectibleText[(int)myCollectible];
+            message = collectibleText[(int)myCollectible];
+            Notificatons.ShowNotification(message, 3f);
         }
-        else
+        else if ((myType != ItemType.IslandHeart) && (myType != ItemType.Main))
         {
-            messageText.text = messages[(int)myType];
+            message = messages[(int)myType];
+            Notificatons.ShowNotification(message, baseDuration);
         }
 
-        // and begin to fade it out
-        StartCoroutine(Fade());
+
     }
 
 
@@ -211,7 +210,7 @@ public class Item : MonoBehaviour
             {
                 InteractionManager.SetItemFound((int)myCollectible, true, false);
                 print("Collectible points" + collectiblePoints[(int)myCollectible]);
-                ExpManager.UpdateXP(collectiblePoints[(int)myCollectible - 1]);
+                ExpManager.UpdateXP(collectiblePoints[(int)myCollectible]);
             }
             else if (myType == ItemType.Chest)
             {
@@ -225,86 +224,89 @@ public class Item : MonoBehaviour
                 InteractionManager.SetItemFound((int)myType, false, false);
                 ExpManager.UpdateXP(itemPoints[(int)myType]);
             }
+            else if (myType == ItemType.IslandHeart)
+            {
+                // make sure the player has found the mountain blood first
+                if (InteractionManager.foundMountainBlood)
+                {
+                    InteractionManager.SetItemFound((int)myType, false, false);
+                    ExpManager.UpdateXP(itemPoints[(int)myType]);
+                }
+            }
             else
             {
                 InteractionManager.SetItemFound((int)myType, false, false);
                 ExpManager.UpdateXP(itemPoints[(int)myType]);
             }
 
-
-
-
-            // dont show the display in these cases
-            if (myType != ItemType.Main && myType != ItemType.Coin)
-            {
-                HandleMessageDisplay();
-            }
-            else if (myType == ItemType.Gem || myType == ItemType.Coin)
-            {
-                // instead of destroying, begin timer so we can make it reappear
-                //Destroy(gameObject, _audioClip.length);
-                StartCoroutine(ReplaceItem());
-            }
+            HandleRemoval();
 
         }
+    }
+
+    private void HandleRemoval()
+    {
+        // dont show the display if its a coin
+        if (myType != ItemType.Coin && myType != ItemType.IslandHeart)
+            HandleMessageDisplay();
+        else if (myType == ItemType.Gem || myType == ItemType.Coin)
+            StartCoroutine(ReplaceItem());// instead of destroying, begin timer so we can make it reappear
+        else
+            Destroy(gameObject, _audioClip.length);
     }
 
     IEnumerator ReplaceItem()
     {
-        yield return new WaitForSeconds(120f);
+        yield return new WaitForSeconds(myType == ItemType.Gem ? 340f : 120f);
         EnableThisObject(true);
     }
 
 
-    IEnumerator Fade()
-    {
-        yield return new WaitForSeconds(4f);
-        float counter = 0f;
-        while (counter < fadeDuration)
-        {
-            counter += Time.deltaTime;
-            messageText.color = Color.Lerp(TextStartColor, TextEndColor, counter);
-            messagePanelImage.color = Color.Lerp(OnColor, OffColor, counter);
-            // destroy once we have done everything we need to do IF this is a gem
-            if (myType == ItemType.Gem)
-                Destroy(gameObject, _audioClip.length);
-            else
-            {
-                EnableThisObject(false);
-            }
-
-            yield return null;
-        }
-    }
     private void EnableThisObject(bool state)
     {
-        Renderer[] renderers = GetComponentsInChildren<Renderer>();
-        foreach (Renderer r in renderers)
-            r.enabled = state;
-        // disable the collider right away
+        // disable the collider on this object right away
         gameObject.GetComponent<SphereCollider>().enabled = state;
+
+        // the mountain blood doesn't have a child mesh renderer
+        if (myType != ItemType.Main)
+        {
+            //hide the mesh of the child "core"
+            if (transform.childCount > 0)
+                transform.GetChild(0).GetComponent<MeshRenderer>().enabled = state;
+        }
+        else if (myType != ItemType.IslandHeart)//islandheart has nothing to hide
+        {
+            gameObject.GetComponent<MeshRenderer>().enabled = state;
+        }
+
     }
 
     private void Update()
     {
-        //show this object only if we are poisoned
-        if (myType == ItemType.Potion && InteractionManager.instance.speedReduced)
+        // turn this items on if they arent already
+        if (!gameObject.activeInHierarchy)
         {
-            EnableThisObject(true);
-        }
+            HandleCollectibles();
 
-        //show this object only if we have stamina, but not if we're poisoned
-        if (myType == ItemType.Jug && InteractionManager.instance.hasStamina && !InteractionManager.instance.speedReduced)
-        {
-            EnableThisObject(true);
-        }
-
-
-        if (myType == ItemType.Halo)
-        {
-            if (PuzzleTimer.instance.timeMinutes > 3)
+            //show this object only if we are poisoned
+            if (myType == ItemType.Potion && InteractionManager.instance.speedReduced)
             {
                 EnableThisObject(true);
+            }
+
+            //show this object only if we have stamina, but not if we're poisoned
+            if (myType == ItemType.Jug && InteractionManager.instance.hasStamina && !InteractionManager.instance.speedReduced)
+            {
+                EnableThisObject(true);
+            }
+
+
+            if (myType == ItemType.Halo)
+            {
+                if (PuzzleTimer.instance.timeMinutes > 3)
+                {
+                    EnableThisObject(true);
+                }
             }
         }
 
@@ -314,8 +316,6 @@ public class Item : MonoBehaviour
             transform.Rotate(SpinX ? spinAmount : 0, SpinY ? spinAmount : 0, SpinZ ? spinAmount : 0);
         }
 
-        // monitor always
-        HandleCollectibles();
 
     }
 }

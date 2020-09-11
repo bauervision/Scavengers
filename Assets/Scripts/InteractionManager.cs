@@ -82,6 +82,8 @@ public class InteractionManager : MonoBehaviour
     public static int finalMinutes = 0;
     public static int finalSeconds = 0;
 
+    public static bool foundMountainBlood;
+
 
     private string[] goodieBag = new[] { "Bag O' Nothing", "Goggles", "Halo", "Radar", "Bad Knees", "Stamina", "Poisoned" };
     private int[] goodieBagDeductions = new[] { 0, -10, -100, -200, 50, 150, 500 };
@@ -258,6 +260,7 @@ public class InteractionManager : MonoBehaviour
         levelTotalPoints = 0;
         finalMinutes = 0;
         finalSeconds = 0;
+        foundMountainBlood = false;
     }
 
     private void InitializeGoodieBagAbilities()
@@ -297,29 +300,10 @@ public class InteractionManager : MonoBehaviour
         // now turn on only what we pulled from the bag
         switch (goodieBagChoice)
         {
-            case 1: // goggles = show all ghost dropzones
-                {
-                    foreach (GameObject dropzone in spawnLocations)
-                    {
-                        dropzone.GetComponent<MeshRenderer>().enabled = true;
-                    }
-                    break;
-                }
-            case 2: // halo
-                {
-                    EnableHalo();
-                    break;
-                }
-            case 3: //radar
-                {
+            case 1: EnableGoggles(); break;
+            case 2: EnableHalo(); break;
+            case 3: EnableRadar(); break;
 
-                    if (chosenDropzoneIndex != -1)
-                    {
-                        spawnLocations[chosenDropzoneIndex].GetComponentInChildren<Light>().enabled = true;
-                    }
-
-                    break;
-                }
             case 4: { canJump = false; canSprint = false; break; }//bad knees
             case 5: { hasStamina = true; GoodieBagStamina.SetActive(true); break; }//stamina
             case 6: { SetPoisoned(true); break; }//poison
@@ -328,6 +312,20 @@ public class InteractionManager : MonoBehaviour
 
     }
 
+    private void EnableGoggles()
+    {
+        foreach (GameObject dropzone in spawnLocations)
+        {
+            dropzone.GetComponent<MeshRenderer>().enabled = true;
+        }
+    }
+    private void EnableRadar()
+    {
+        if (chosenDropzoneIndex != -1)
+        {
+            spawnLocations[chosenDropzoneIndex].GetComponentInChildren<Light>().enabled = true;
+        }
+    }
     private void EnableHalo()
     {
         GoodieBagUIText.text = goodieBag[2];
@@ -506,7 +504,7 @@ public class InteractionManager : MonoBehaviour
                 switch (itemFound)
                 {
                     // main level items
-                    case 0: { LevelCompleted(); break; }
+                    case 0: { foundMountainBlood = true; break; }
                     case 1: { instance.levelBonusItemScore++; instance.bonusItem1Sprite.sprite = instance.foundSprite; instance.foundBonus1 = true; break; }
                     case 2: { instance.levelBonusItemScore++; instance.bonusItem2Sprite.sprite = instance.foundSprite; instance.foundBonus2 = true; break; }
                     // collectibles
@@ -517,6 +515,7 @@ public class InteractionManager : MonoBehaviour
                     case 7: { break; }//jug
                     case 8: { instance.EnableHalo(); break; }//halo enabled
                     case 9: { instance.EnableThrow(true); break; } // found the shroom
+                    case 10: LevelCompleted(); break;
                     default: { break; }
                 }
             }
@@ -540,7 +539,7 @@ public class InteractionManager : MonoBehaviour
     {
         notifyPanel.GetComponent<Image>().color = OnColor;
         notifyText.color = new Color(1, 1, 1, 1);
-        notifyText.text = "You've found the Mountain Blood!\nBe sure you are ready to end the level before you grab it!\nDid you find everything you wanted to find in this level?";
+        notifyText.text = "You've found the Island Heart!\nEnter to join it with the blood to revive the island!";
 
     }
 
@@ -667,7 +666,7 @@ public class InteractionManager : MonoBehaviour
 
         if (ControlFreak2.CF2Input.GetKey(KeyCode.P))
         {
-            SetPoisoned(true);
+            EnableRadar();
         }
 
         // if we are showing the throw button and run out of seeds, hide the button
