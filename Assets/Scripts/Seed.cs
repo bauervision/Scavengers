@@ -41,8 +41,20 @@ public class Seed : MonoBehaviour
         //disable the mesh
         gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
         gameObject.GetComponent<SphereCollider>().enabled = false;
+
+
+        // update our XP
+        switch ((int)mySeedType)
+        {
+            case 0: ExpManager.UpdateXP(100); break;// flower sprouted
+            case 1: ExpManager.UpdateXP(50); break;// coins sprouted
+            case 2: ExpManager.UpdateXP(1000); break;// crystals sprouted
+            case 3: ExpManager.UpdateXP(2500); break;// tree sprouted
+            case 4: ExpManager.UpdateXP(250); break;// spidertrap sprouted
+        }
         // destroy the seed
         Destroy(gameObject, _audioClip.length);
+
     }
 
     public void GetTerrainTexture()
