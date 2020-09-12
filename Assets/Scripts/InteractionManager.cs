@@ -28,6 +28,7 @@ public class InteractionManager : MonoBehaviour
     private GameObject[] spawnLocations;
     private GameObject[] mysteryLocations;
     private GameObject GoodieBag;
+    private GameObject GoodieBagResult;
     private Text GoodieBagText;
     private Text GoodieBagUIText;
     private GameObject GoodieBagStamina;
@@ -90,7 +91,7 @@ public class InteractionManager : MonoBehaviour
 
     private string[] goodieBagDescription = new[] {
         "Bag O' Nothing!\nYou enter the level with all that you came with, no help or hindrances to speak of, good luck!",
-        "Goggles!\nYou have gained the ability to see the special item spawn bubbles! This can speed up your location time greatly because you now know where the item is NOT!",
+        "Goggles!\nYou have gained the ability to see where the Mountain Blood can appear! Keep a mental note of all the spots, as it can help you later!",
         "Halo!\nDown from the heavens you will see beams of light pointing to every place the special items might be. Instead of randomly running around, you now know exactly where to look!",
         "Radar!\nLike the Halo, except you will only see one ray of light from the sky, directly where the item is!",
         "Bad Knees!\nOuch, you've injured your knees which means no jumping for you today!",
@@ -139,6 +140,8 @@ public class InteractionManager : MonoBehaviour
         // set this before we disable the throw button
         SeedCountText = GameObject.Find("SeedCount").GetComponent<Text>();
         throwButton = GameObject.Find("ShroomLauncher");
+        GoodieBag = GameObject.Find("GoodieBag");
+        GoodieBagResult = GameObject.Find("GoodieResult");
 
 
 
@@ -149,7 +152,7 @@ public class InteractionManager : MonoBehaviour
         mysteryLocations = GameObject.FindGameObjectsWithTag("MysteryChest");
 
         // grab and assign listeners to all buttons
-        GoodieBag = GameObject.Find("GoodieBag");
+
         GoodieBag.GetComponent<Button>().onClick.AddListener(GrabGoodieBag);
         LoadLevelButton = GameObject.Find("LoadLevelButton").GetComponent<Button>();
         LoadLevelButton.GetComponent<Button>().onClick.AddListener(PlayLevel);
@@ -285,6 +288,7 @@ public class InteractionManager : MonoBehaviour
     public void GrabGoodieBag()
     {
         GoodieBag.SetActive(false);
+        GoodieBagResult.SetActive(true);
 
         int goodieBagChoice = Random.Range(0, goodieBag.Length);
 
@@ -380,6 +384,7 @@ public class InteractionManager : MonoBehaviour
         levelCanvas.SetActive(false);
         mobileCanvas.SetActive(false);
         throwButton.SetActive(false);
+        GoodieBagResult.SetActive(false);
 
         SpawnItem();
         SpawnMysteryChests();
