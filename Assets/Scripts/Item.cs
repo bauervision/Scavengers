@@ -129,6 +129,7 @@ public class Item : MonoBehaviour
         // hide this item by default if one of these basic categories
         if (myType == ItemType.Potion || myType == ItemType.Jug || myType == ItemType.Halo)
         {
+
             EnableThisObject(false);
         }
         else if (myType == ItemType.Chest)
@@ -147,13 +148,24 @@ public class Item : MonoBehaviour
     private void HandleMessageDisplay()
     {
         string message = "";
+        string guideMessage = "";
         float baseDuration = 2f;
 
         if (myType == ItemType.Main)
         {
             message = "Great job! Now just locate the heart of the island!";
             Notificatons.ShowNotification(message, baseDuration);
+            guideMessage = "You have found the mysyterious Mountain Blood, now you are trying to locate the heart of the island.  See if you can find anything similiar to the Mountain Blood around the island. Maybe...the same color, or texture...";
+            Guide.UpdateGuide(guideMessage);
 
+        }
+        if (myType == ItemType.IslandHeart)
+        {
+            if (InteractionManager.foundMountainBlood)
+            {
+                guideMessage = "At last! You have found the Island Heart and the Mountain Blood! Before you enter the heart, be sure that you are done with the island. Is there anything else you might like to find before you leave?";
+                Guide.UpdateGuide(guideMessage);
+            }
         }
         if (myType == ItemType.Gem)//certain items have an array of messages to display
         {
@@ -187,11 +199,19 @@ public class Item : MonoBehaviour
         {
             message = collectibleText[(int)myCollectible];
             Notificatons.ShowNotification(message, 3f);
+
+            if (InteractionManager.foundMountainBlood)
+                guideMessage = "Since you have already found the Mountain Blood, keep searching for more of these rare items, I'm sure there is much to be found!";
+            else
+                guideMessage = "You are still exploring and have yet to locate the Mountain Blood, but collecting items like this will go a long way to boost your experience, keep looking everywhere!";
+
+            Guide.UpdateGuide(guideMessage); ;
         }
         else if ((myType != ItemType.IslandHeart) && (myType != ItemType.Main))
         {
             message = messages[(int)myType];
             Notificatons.ShowNotification(message, baseDuration);
+
         }
 
 
@@ -289,13 +309,13 @@ public class Item : MonoBehaviour
             HandleCollectibles();
 
             //show this object only if we are poisoned
-            if (myType == ItemType.Potion && InteractionManager.instance.speedReduced)
+            if (myType == ItemType.Potion)
             {
-                EnableThisObject(true);
+                EnableThisObject(InteractionManager.instance.speedReduced);
             }
 
             //show this object only if we have stamina, but not if we're poisoned
-            if (myType == ItemType.Jug && InteractionManager.instance.hasStamina && !InteractionManager.instance.speedReduced)
+            if (myType == ItemType.Jug && (InteractionManager.instance.hasStamina && !InteractionManager.instance.speedReduced))
             {
                 EnableThisObject(true);
             }
