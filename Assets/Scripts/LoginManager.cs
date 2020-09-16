@@ -8,10 +8,14 @@ public class LoginManager : MonoBehaviour
     public GameObject loginScreen;
     public GameObject createScreen;
     public GameObject characterScreen;
+    public GameObject characterScreenNew;
     public GameObject levelScreen;
     public GameObject characterSelectButton;
     public GameObject loadScreen;
+
     public Text characterSelectText;
+
+
 
     private string[] levels = new string[] { "Isle of Noob", "Mount Ego" };
     private string selectedLevel;
@@ -24,8 +28,11 @@ public class LoginManager : MonoBehaviour
         loginScreen.SetActive(false);
         createScreen.SetActive(false);
         characterScreen.SetActive(false);
+        characterScreenNew.SetActive(false);
         levelScreen.SetActive(false);
         loadScreen.SetActive(false);
+        characterSelectButton.SetActive(false);
+
     }
 
     public void ShowCreateScreen()
@@ -39,27 +46,27 @@ public class LoginManager : MonoBehaviour
         characterScreen.SetActive(true);
         levelScreen.SetActive(false);
         loginScreen.SetActive(false);
-        characterSelectButton.GetComponent<Button>().interactable = false;
+        characterSelectButton.SetActive(false);
         characterSelectText.text = "Select Character";
     }
     public void SelectCaden()
     {
         characterChoice = 0;
         characterSelectText.text = "Confirm Caden!";
-        characterSelectButton.GetComponent<Button>().interactable = true;
+        characterSelectButton.SetActive(true);
     }
 
     public void SelectMiles()
     {
         characterChoice = 1;
         characterSelectText.text = "Confirm Miles!";
-        characterSelectButton.GetComponent<Button>().interactable = true;
+        characterSelectButton.SetActive(true);
     }
     public void SelectLuke()
     {
         characterChoice = 2;
         characterSelectText.text = "Confirm Luke!";
-        characterSelectButton.GetComponent<Button>().interactable = true;
+        characterSelectButton.SetActive(true);
     }
 
     public void ShowLoginScreen()
@@ -70,16 +77,19 @@ public class LoginManager : MonoBehaviour
 
     public void ShowCharacterScreen()
     {
+        createScreen.SetActive(false);
         characterScreen.SetActive(true);
         loginScreen.SetActive(false);
-        characterSelectButton.GetComponent<Button>().interactable = false;
+        characterSelectButton.SetActive(false);
         characterSelectText.text = "Select Character";
+
     }
 
     public void ShowLevelScreen()
     {
         levelScreen.SetActive(true);
         characterScreen.SetActive(false);
+        characterScreenNew.SetActive(false);
     }
 
     public void LoadLevel_1()
@@ -89,7 +99,7 @@ public class LoginManager : MonoBehaviour
         levelScreen.SetActive(false);
         loadScreen.SetActive(true);
 
-        SceneManager.LoadScene("IsleOfNoob");
+        SceneManager.LoadScene("Isle Of Noob");
     }
 
     public void ShowInitialScreen()
@@ -98,7 +108,18 @@ public class LoginManager : MonoBehaviour
         loginScreen.SetActive(false);
         createScreen.SetActive(false);
         characterScreen.SetActive(false);
+        characterScreenNew.SetActive(false);
         levelScreen.SetActive(false);
+    }
+
+    public void ShowCharacterScreenNew()
+    {
+        createScreen.SetActive(false);
+        characterScreenNew.SetActive(true);
+        loginScreen.SetActive(false);
+        characterSelectButton.SetActive(false);
+
+
     }
 
 

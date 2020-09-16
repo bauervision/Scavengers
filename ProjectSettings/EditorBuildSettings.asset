@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/StartMenu.unity
+    guid: 2e853c2a69429054da472167f45de90f
+  - enabled: 1
     path: Assets/Scenes/Isle of Noob.unity
     guid: d91e91b9ba482ca40b546f494c2a1e46
   m_configObjects:
