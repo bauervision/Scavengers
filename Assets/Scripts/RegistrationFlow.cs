@@ -45,10 +45,23 @@ public class RegistrationFlow : MonoBehaviour
         _registerUser.gameObject.SetActive(false);
     }
 
-    private void HandleRegisterUser()
+    public void HandleRegisterUser()
     {
-        print("New User Registering: " + Name + " email: " + Email);
+        HandleFirebase.SendNewRegistration(Name, Email, Password);
     }
+
+    public static void SuccessfulRegistration(string name)
+    {
+        print("Reg was succesful with user: " + name);
+        LoginManager.instance.ShowCharacterScreenNew();
+    }
+
+    public static void FailedRegistration(string name)
+    {
+        print("Reg failed for user: " + name);
+
+    }
+
     private void HandleValueChanged(string _)
     {
         ComputeState();

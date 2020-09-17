@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class LoginManager : MonoBehaviour
 {
+    public static LoginManager instance;
     public GameObject initialScreen;
     public GameObject loginScreen;
     public GameObject createScreen;
@@ -25,6 +26,7 @@ public class LoginManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
         loginScreen.SetActive(false);
         createScreen.SetActive(false);
         characterScreen.SetActive(false);
@@ -114,11 +116,10 @@ public class LoginManager : MonoBehaviour
 
     public void ShowCharacterScreenNew()
     {
-        createScreen.SetActive(false);
-        characterScreenNew.SetActive(true);
-        loginScreen.SetActive(false);
-        characterSelectButton.SetActive(false);
-
+        instance.createScreen.SetActive(false);
+        instance.characterScreenNew.SetActive(true);
+        instance.loginScreen.SetActive(false);
+        instance.characterSelectButton.SetActive(false);
 
     }
 
