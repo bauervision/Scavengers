@@ -7,7 +7,7 @@ public class ExpManager : MonoBehaviour
 {
     public ExpManager instance;
     private Text XpText;
-    public static int xp;
+
     private int nextLevel;
     public enum Ranking
     {
@@ -127,39 +127,43 @@ public class ExpManager : MonoBehaviour
         100000000
     };
     public static Ranking myRanking;
+    private Text savingText;
 
 
     private void Awake()
     {
         XpText = GameObject.Find("XpText").GetComponent<Text>();
+        savingText = GameObject.Find("SavingText").GetComponent<Text>();
     }
 
     public static void UpdateXP(int xpIncrease)
     {
-        xp += xpIncrease;
+        ManagePlayerData.thisPlayer.XP += xpIncrease;
     }
     private void Start()
     {
         instance = this;
-        // TODO: fetch the xp from the database
-        nextLevel = nextLevelPoints[(int)myRanking];
+        myRanking = (Ranking)ManagePlayerData.thisPlayer.rank;
+        savingText.text = "";
+        //StartCoroutine(AutoSave());
     }
 
     private void Update()
     {
-        if (ControlFreak2.CF2Input.GetKeyUp(KeyCode.X))
-            UpdateXP(500);
+        // if (ControlFreak2.CF2Input.GetKeyUp(KeyCode.X))
+        //     UpdateXP(500);
 
         MonitorRanking();
 
         nextLevel = nextLevelPoints[(int)myRanking];
 
         //keep xpText updated with current xp value
-        XpText.text = $"XP: {xp}/{nextLevel}\nRank:{myRanking}";
+        XpText.text = $"XP: {ManagePlayerData.thisPlayer.XP}/{nextLevel}\nRank:{myRanking}";
     }
 
     private void MonitorRanking()
     {
+        double xp = ManagePlayerData.thisPlayer.XP;
         // will probably break this out further into color levels for each stage
         if (xp < 5000) myRanking = Ranking.Noob;
         if (xp >= 5000 && xp < 10000) myRanking = Ranking.Pro;
@@ -226,5 +230,22 @@ public class ExpManager : MonoBehaviour
 
     }
 
+
+    private IEnumerator AutoSave()
+    {
+
+        yield return new WaitForSeconds(4f);
+        savingText.text = "Saving...";
+        // turn on save icon
+        ManagePlayerData.instance.SavePlayerData();
+
+
+        savingText.text = "";
+        // call it again
+
+        // turn off save icon
+
+
+    }
 
 }

@@ -3,46 +3,66 @@ using System.Collections.Generic;
 using Firebase;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class RegistrationFlow : MonoBehaviour
 {
+    public static RegistrationFlow instance;
+
     [SerializeField] private InputField _nameField;
     [SerializeField] private InputField _emailField;
     [SerializeField] private InputField _passwordField;
     [SerializeField] private InputField _passwordFieldConfirm;
     [SerializeField] private Button _registerUser;
+    [SerializeField] private Button _loginUser;
     [SerializeField] private Text _newUserTitle;
+    [SerializeField] public Text _emailFormText;
+
+
+    [SerializeField] private InputField _returningEmailField;
+    [SerializeField] private InputField _returningPasswordField;
 
     public string Name => _nameField.text;
     private string Email => _emailField.text;
     private string Password => _passwordField.text;
+
+    private string UserEmail => _returningEmailField.text;
+    private string UserPassword => _returningPasswordField.text;
 
     public Color defaultColor = new Color(255, 255, 255);
     public Color goodColor = new Color(255, 255, 255);
     public Color highlightedColor = new Color(0, 200, 50);
     public Color redColor = new Color(255, 0, 0);
 
-    private bool nameGood, emailGood, passwordGood, confirmedGood;
+    private Color defaultTextColor;
+
+    private bool nameGood, emailGood, passwordGood, confirmedGood, emailBad;
 
 
 
-    private enum FormState { Name, Email, Password, PasswordsDontMatch, Ok };
+    public enum FormState { Name, Email, Password, PasswordsDontMatch, Ok, ExistingEmail };
 
-    private FormState myForm;
+    public static FormState myForm;
 
     public static string staticName;
 
+    private static string previousEmail;
+
     private void Start()
     {
-        //_nameField.onValueChanged.AddListener(HandleValueChanged);
+        instance = this;
+
         _nameField.onEndEdit.AddListener(HandleValueChanged);
-        //_emailField.onValueChanged.AddListener(HandleValueChanged);
         _emailField.onEndEdit.AddListener(HandleValueChanged);
         _passwordField.onEndEdit.AddListener(HandleValueChanged);
         _passwordFieldConfirm.onValueChanged.AddListener(HandleValueChanged);
 
         _registerUser.onClick.AddListener(HandleRegisterUser);
         _registerUser.gameObject.SetActive(false);
+        _loginUser.onClick.AddListener(HandleLoginUser);
+
+        // grab the default color of the email text field
+        defaultTextColor = _emailFormText.gameObject.GetComponent<Text>().color;
     }
 
     public void HandleRegisterUser()
@@ -56,9 +76,29 @@ public class RegistrationFlow : MonoBehaviour
         LoginManager.instance.ShowCharacterScreenNew();
     }
 
-    public static void FailedRegistration(string name)
+    public static void FailedRegistration(string email)
     {
-        print("Reg failed for user: " + name);
+        instance._emailFormText.text = "Email already in use! Maybe log in?";
+        myForm = FormState.ExistingEmail;
+        // store the failed email
+        previousEmail = email;
+
+    }
+
+    public void HandleLoginUser()
+    {
+        HandleFirebase.LoginReturningUser(UserEmail, UserPassword);
+    }
+
+    public static void SuccessfulLogin(Task<PlayerData> loadedData)
+    {
+        print("Login was succesful with user: " + loadedData.Result.name);
+
+    }
+
+    public static void FailedLogin(string email)
+    {
+        print("Login failed for user: " + email);
 
     }
 
@@ -70,21 +110,30 @@ public class RegistrationFlow : MonoBehaviour
 
     private void ComputeState()
     {
-        if (string.IsNullOrEmpty(_nameField.text))
+        if (!string.IsNullOrEmpty(_nameField.text))
         {
             myForm = FormState.Name;
-
+            nameGood = true;
+            _newUserTitle.text = $"Welcome {Name}!";
         }
         if (string.IsNullOrEmpty(_emailField.text))
         {
-            if (_nameField.text != null)
+            if (emailBad)
             {
-                nameGood = true;
-                _newUserTitle.text = $"Welcome {Name}!";
+                if (previousEmail != Email)
+                {
+                    emailBad = false;
+                    emailGood = true;
+                    previousEmail = "";
+                }
+
+            }
+            else
+            {
+                myForm = FormState.Email;
+                emailGood = true;
             }
 
-            myForm = FormState.Email;
-            emailGood = true;
         }
         else if (string.IsNullOrEmpty(_passwordField.text))
         {
@@ -107,10 +156,11 @@ public class RegistrationFlow : MonoBehaviour
     }
 
 
+
     private void TurnAllFieldsWhite()
     {
         _nameField.gameObject.GetComponent<Image>().color = nameGood ? goodColor : defaultColor;
-        _emailField.gameObject.GetComponent<Image>().color = emailGood ? goodColor : defaultColor;
+        _emailField.gameObject.GetComponent<Image>().color = (emailGood) ? goodColor : (emailBad) ? redColor : defaultColor;
         _passwordField.gameObject.GetComponent<Image>().color = passwordGood ? goodColor : defaultColor;
         _passwordFieldConfirm.gameObject.GetComponent<Image>().color = confirmedGood ? goodColor : defaultColor;
     }
@@ -139,6 +189,16 @@ public class RegistrationFlow : MonoBehaviour
             case FormState.Password: { TurnAllFieldsWhite(); _passwordField.gameObject.GetComponent<Image>().color = highlightedColor; break; }
             case FormState.PasswordsDontMatch: { TurnAllFieldsWhite(); _passwordFieldConfirm.gameObject.GetComponent<Image>().color = redColor; break; }
             case FormState.Ok: { TurnAllFieldsWhite(); break; }//unlock the submit button
+            case FormState.ExistingEmail:
+                {
+                    TurnAllFieldsWhite();
+                    emailBad = true;
+                    _emailField.gameObject.GetComponent<Image>().color = redColor;
+                    _emailFormText.gameObject.GetComponent<Text>().color = redColor;
+                    // lock the user fromm resubmitting bad data
+                    _registerUser.gameObject.SetActive(false);
+                    break;
+                }//unlock the submit button
         }
     }
 }
