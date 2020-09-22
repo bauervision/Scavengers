@@ -4,21 +4,24 @@ using System.Collections.Generic;
 
 public class UnlockedLevels : IEnumerable<Level>
 {
-    public List<Level> myLevels;
+    public List<Level> availableLevels;
 
     public UnlockedLevels()
     {
-        List<Level> myLevels = new List<Level>();
+        this.availableLevels = new List<Level>();
+        Level firstLevel = new Level("Isle of Noob");
+        this.availableLevels.Add(firstLevel);
+
     }
 
     public IEnumerator<Level> GetEnumerator()
     {
-        return myLevels.GetEnumerator();
+        return availableLevels.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return myLevels.GetEnumerator();
+        return availableLevels.GetEnumerator();
     }
 
 }

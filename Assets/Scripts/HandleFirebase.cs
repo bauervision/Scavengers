@@ -81,9 +81,9 @@ public class HandleFirebase : MonoBehaviour
         // at this point, we either have a successful login or an issue, so lets handle both cases
         if (loginTask.Exception != null)
         {
-            print($"Failed to login user: {loginTask.Exception}");
-            // do something to the UI with the failure
-            RegistrationFlow.FailedLogin(email);
+            print($"Failed to login user: {loginTask.Exception.Message}");
+            // do something to the UI with the failure.
+            RegistrationFlow.FailedLogin(loginTask.Exception.Message);
 
         }
         else

@@ -20,12 +20,7 @@ public class LoginManager : MonoBehaviour
 
     public Text characterSelectText;
     public Text currentData;
-    public Slider progressBar;
 
-
-
-    private string[] levels = new string[] { "Isle of Noob", "Mount Ego" };
-    private string selectedLevel;
 
     private int characterChoice = -1;
 
@@ -101,52 +96,18 @@ public class LoginManager : MonoBehaviour
     public void ShowLevelScreen()
     {
         levelScreen.SetActive(true);
+        LevelLoader.SetAvailableLevels();// trigger the available levels look up from player data
         characterScreen.SetActive(false);
         characterScreenNew.SetActive(false);
     }
 
-    public void LoadLevel_1()
+    public static void LoadLevel()
     {
-        selectedLevel = levels[0];
-        print("Load level: " + selectedLevel);
-        levelScreen.SetActive(false);
-        loadScreen.SetActive(true);
-
-        StartCoroutine(LoadScene());
-
+        instance.levelScreen.SetActive(false);
+        instance.loadScreen.SetActive(true);
     }
 
-    IEnumerator LoadScene()
-    {
-        yield return null;
 
-        //Begin to load the Scene you specify
-        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync("Isle Of Noob");
-        //Don't let the Scene activate until you allow it to
-        asyncOperation.allowSceneActivation = false;
-
-        //When the load is still in progress, output the Text and progress bar
-        while (!asyncOperation.isDone)
-        {
-            //Output the current progress
-            progressBar.value = asyncOperation.progress;
-
-            // Check if the load has finished
-            if (asyncOperation.progress >= 0.9f)
-            {
-                // hide the progress bar
-                progressBar.gameObject.SetActive(false);
-                // //Change the Text to show the Scene is ready
-                // m_Text.text = "Press the space bar to continue";
-                // //Wait to you press the space key to activate the Scene
-                // if (Input.GetKeyDown(KeyCode.Space))
-                //     //Activate the Scene
-                asyncOperation.allowSceneActivation = true;
-            }
-
-            yield return null;
-        }
-    }
     public void ShowInitialScreen()
     {
         initialScreen.SetActive(true);

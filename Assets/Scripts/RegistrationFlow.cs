@@ -17,6 +17,7 @@ public class RegistrationFlow : MonoBehaviour
     [SerializeField] private Button _loginUser;
     [SerializeField] private Text _newUserTitle;
     [SerializeField] public Text _emailFormText;
+    [SerializeField] public Text _warningText;
 
 
     [SerializeField] private InputField _returningEmailField;
@@ -44,6 +45,10 @@ public class RegistrationFlow : MonoBehaviour
 
     public static FormState myForm;
 
+    public enum ReturningFormState { Email, Password, BadEmailOrPassword, Ok };
+
+    public static ReturningFormState myReturningForm;
+
     public static string staticName;
 
     private static string previousEmail;
@@ -57,12 +62,18 @@ public class RegistrationFlow : MonoBehaviour
         _passwordField.onEndEdit.AddListener(HandleValueChanged);
         _passwordFieldConfirm.onValueChanged.AddListener(HandleValueChanged);
 
+        _returningEmailField.onEndEdit.AddListener(HandleValueChangedReturning);
+        _returningPasswordField.onValueChanged.AddListener(HandleValueChangedReturning);
+
         _registerUser.onClick.AddListener(HandleRegisterUser);
         _registerUser.gameObject.SetActive(false);
+
         _loginUser.onClick.AddListener(HandleLoginUser);
+        _loginUser.gameObject.SetActive(false);
 
         // grab the default color of the email text field
         defaultTextColor = _emailFormText.gameObject.GetComponent<Text>().color;
+        _warningText.text = "";
     }
 
     public void HandleRegisterUser()
@@ -93,18 +104,29 @@ public class RegistrationFlow : MonoBehaviour
     public static void SuccessfulLogin(Task<PlayerData> loadedData)
     {
         print("Login was succesful with user: " + loadedData.Result.name);
+        myReturningForm = ReturningFormState.Ok;
 
     }
 
     public static void FailedLogin(string email)
     {
         print("Login failed for user: " + email);
+        instance._warningText.text = "Email or Password error, please try again";
+        instance._loginUser.gameObject.SetActive(false);
+        myReturningForm = ReturningFormState.BadEmailOrPassword;
+        previousEmail = email;
+        instance.emailBad = true;
 
     }
 
     private void HandleValueChanged(string _)
     {
         ComputeState();
+    }
+
+    private void HandleValueChangedReturning(string _)
+    {
+        ComputeReturningState();
     }
 
 
@@ -155,6 +177,44 @@ public class RegistrationFlow : MonoBehaviour
 
     }
 
+    private void ComputeReturningState()
+    {
+        if (!string.IsNullOrEmpty(_returningEmailField.text))
+        {
+            myReturningForm = ReturningFormState.Email;
+            if (emailBad)
+            {
+                if (previousEmail != UserEmail)
+                {
+                    emailBad = false;
+                    previousEmail = "";
+                    _loginUser.gameObject.SetActive(true);
+                }
+
+            }
+            else
+            {
+                myForm = FormState.Email;
+                emailGood = true;
+            }
+
+        }
+        if (!string.IsNullOrEmpty(_returningPasswordField.text))
+        {
+            myReturningForm = ReturningFormState.Password;
+        }
+        else
+        {
+            myReturningForm = ReturningFormState.Ok;
+            _warningText.text = "";
+
+            // unlock the login button
+            _loginUser.gameObject.SetActive(true);
+        }
+
+
+    }
+
 
 
     private void TurnAllFieldsWhite()
@@ -199,6 +259,33 @@ public class RegistrationFlow : MonoBehaviour
                     _registerUser.gameObject.SetActive(false);
                     break;
                 }//unlock the submit button
+        }
+
+
+        switch (myReturningForm)
+        {
+            case ReturningFormState.Email:
+                {
+
+                    break;
+                }
+            case ReturningFormState.BadEmailOrPassword:
+                {
+                    _returningEmailField.gameObject.GetComponent<Image>().color = redColor;
+                    _returningPasswordField.gameObject.GetComponent<Image>().color = redColor;
+                    break;
+                }
+            case ReturningFormState.Password:
+                {
+
+                    break;
+                }
+            case ReturningFormState.Ok:
+                {
+                    _returningEmailField.gameObject.GetComponent<Image>().color = defaultColor;
+                    _returningPasswordField.gameObject.GetComponent<Image>().color = defaultColor;
+                    break;
+                }
         }
     }
 }

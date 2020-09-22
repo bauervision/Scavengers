@@ -11,30 +11,48 @@ public class PlayerData
     public int rank;//save as int to convert to Ranking later
     public string rankString;
     public double XP;
-    public Collectibles collection;
-    public Attachments attachments;
     public string greatestItem;
-
-    //public UnlockedLevels availableLevels;
-
-    // now save less exciting data
     public ulong dateJoined;
+    public List<Collectible> collection;
+    public List<Attachment> attachments;
+
+    public List<Level> availableLevels;
 
 
 
-    public PlayerData()
+    public PlayerData(string email, string userId, string name, ulong date)
     {
-        this.userId = "unknown";
-        this.name = "unknown name";
-        this.email = "unknown email";
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
         this.rank = 0;
         this.rankString = "Noob";
         this.XP = 0;
-        this.collection = new Collectibles();
-        this.attachments = new Attachments();
         this.greatestItem = "nothing yet";
         this.dateJoined = 0;
-        //this.availableLevels = new UnlockedLevels();
+
+        // handle all lists
+        this.collection = new List<Collectible>();
+        Collectible defaultCollectible = new Collectible("defaultCollectible", 0);
+        this.collection.Add(defaultCollectible);
+
+        this.attachments = new List<Attachment>();
+        Attachment starterGear = new Attachment("starterGear", 0);
+        this.attachments.Add(starterGear);
+
+        // create and add all 10 levels
+        this.availableLevels = new List<Level>();
+        for (int i = 0; i < 10; i++)
+        {
+            Level newLevel;
+            if (i == 0)
+                newLevel = new Level("Isle of Noob");
+            else
+                newLevel = new Level("Unknown");
+
+            this.availableLevels.Add(newLevel);
+        }
+
     }
 
 

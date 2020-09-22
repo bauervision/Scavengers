@@ -25,27 +25,15 @@ public class ManagePlayerData : MonoBehaviour
 
     public static void InitializeNewPlayer(string userId, string email, string name, ulong joinedOn)
     {
-        thisPlayer = new PlayerData();
-        thisPlayer.userId = userId;
-        thisPlayer.email = email;
-        thisPlayer.name = name;
-        thisPlayer.dateJoined = joinedOn;
-
+        thisPlayer = new PlayerData(email, userId, name, joinedOn);
         // save the data
         instance.SavePlayerData();
-        // test print the new player data
-        // print("New Player Data");
-        // print("Name: " + player.name);
-        // print("Email: " + player.email);
-        // print("UserId: " + player.userId);
-        // print("Rank: " + player.rank);
-        // print("XP: " + player.XP.ToString());
-        // print("Joined: " + player.dateJoined.ToString());
     }
 
 
     public void SavePlayerData()
     {
+        print(JsonUtility.ToJson(thisPlayer));
         firebaseDB.GetReference($"users/{thisPlayer.userId}").SetRawJsonValueAsync(JsonUtility.ToJson(thisPlayer));
 
     }

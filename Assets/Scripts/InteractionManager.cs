@@ -341,7 +341,7 @@ public class InteractionManager : MonoBehaviour
 
     private void LoadNextLevel()
     {
-        LevelLoader.instance.PlayNextLevel(((int)thisLevel + 1));
+        //LevelLoader.instance.PlayNextLevel(((int)thisLevel + 1));
     }
     public void PlayLevel()
     {
