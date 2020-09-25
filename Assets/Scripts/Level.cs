@@ -11,6 +11,9 @@ public class Level
     // highest score in this level
     public int highScore;
 
+    public int? bestTimeMinutes;
+    public int? bestTimeSeconds;
+
     public bool hasCompleted;
     // have we found the 2 bonus crystals?
     public bool foundCrystal1;
@@ -26,6 +29,8 @@ public class Level
         this.foundCrystal1 = false;
         this.foundCrystal2 = false;
         this.name = levelName;
+        this.bestTimeMinutes = null;
+        this.bestTimeSeconds = null;
     }
 
 }

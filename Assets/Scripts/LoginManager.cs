@@ -21,7 +21,6 @@ public class LoginManager : MonoBehaviour
     public Text characterSelectText;
     public Text currentData;
 
-
     private int characterChoice = -1;
 
     // Start is called before the first frame update

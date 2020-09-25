@@ -31,11 +31,20 @@ public class ManagePlayerData : MonoBehaviour
     }
 
 
+    // called during registration
     public void SavePlayerData()
     {
         print(JsonUtility.ToJson(thisPlayer));
         firebaseDB.GetReference($"users/{thisPlayer.userId}").SetRawJsonValueAsync(JsonUtility.ToJson(thisPlayer));
 
+    }
+
+    // called from the game
+    public static void SavePlayer(PlayerData currentPlayerData)
+    {
+        thisPlayer = currentPlayerData;
+        print(JsonUtility.ToJson(thisPlayer));
+        instance.firebaseDB.GetReference($"users/{thisPlayer.userId}").SetRawJsonValueAsync(JsonUtility.ToJson(thisPlayer));
     }
 
     public static async Task<PlayerData> LoadPlayer(string userId)

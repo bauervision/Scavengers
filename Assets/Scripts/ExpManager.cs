@@ -74,7 +74,8 @@ public class ExpManager : MonoBehaviour
         Elite_Master,//30,000,000
         Ultra_Master,//40,000,000
         Divine_Master,//50,000,000
-        Infinite_Master//100,000,000,000
+        Infinite_Master,//100,000,000,000
+        DEV
 
     }
 
@@ -130,6 +131,7 @@ public class ExpManager : MonoBehaviour
     private Text savingText;
 
 
+
     private void Awake()
     {
         XpText = GameObject.Find("XpText").GetComponent<Text>();
@@ -138,12 +140,18 @@ public class ExpManager : MonoBehaviour
 
     public static void UpdateXP(int xpIncrease)
     {
-        ManagePlayerData.thisPlayer.XP += xpIncrease;
+        if (ManagePlayerData.thisPlayer != null)
+        {
+            ManagePlayerData.thisPlayer.XP += xpIncrease;
+        }
     }
     private void Start()
     {
         instance = this;
-        myRanking = (Ranking)ManagePlayerData.thisPlayer.rank;
+        if (ManagePlayerData.thisPlayer != null)
+        {
+            myRanking = (Ranking)ManagePlayerData.thisPlayer.rank;
+        }
         savingText.text = "";
         //StartCoroutine(AutoSave());
     }
@@ -155,78 +163,88 @@ public class ExpManager : MonoBehaviour
 
         MonitorRanking();
 
-        nextLevel = nextLevelPoints[(int)myRanking];
+        // make sure we have playerData first
+        if (ManagePlayerData.thisPlayer != null)
+        {
+            nextLevel = nextLevelPoints[(int)myRanking];
 
-        //keep xpText updated with current xp value
-        XpText.text = $"XP: {ManagePlayerData.thisPlayer.XP}/{nextLevel}\nRank:{myRanking}";
+            //keep xpText updated with current xp value
+            XpText.text = $"XP: {ManagePlayerData.thisPlayer.XP}/{nextLevel}\nRank:{myRanking}";
+        }
     }
 
     private void MonitorRanking()
     {
-        double xp = ManagePlayerData.thisPlayer.XP;
-        // will probably break this out further into color levels for each stage
-        if (xp < 5000) myRanking = Ranking.Noob;
-        if (xp >= 5000 && xp < 10000) myRanking = Ranking.Pro;
-        if (xp >= 10000 && xp < 16000) myRanking = Ranking.Master;
+        if (ManagePlayerData.thisPlayer != null)
+        {
+            double xp = ManagePlayerData.thisPlayer.XP;
+            // will probably break this out further into color levels for each stage
+            if (xp < 5000) myRanking = Ranking.Noob;
+            if (xp >= 5000 && xp < 10000) myRanking = Ranking.Pro;
+            if (xp >= 10000 && xp < 16000) myRanking = Ranking.Master;
 
-        if (xp >= 16000 && xp < 24000) myRanking = Ranking.Spotter;
-        if (xp >= 24000 && xp < 30000) myRanking = Ranking.Pro_Spotter;
-        if (xp >= 30000 && xp < 37000) myRanking = Ranking.Master_Spotter;
+            if (xp >= 16000 && xp < 24000) myRanking = Ranking.Spotter;
+            if (xp >= 24000 && xp < 30000) myRanking = Ranking.Pro_Spotter;
+            if (xp >= 30000 && xp < 37000) myRanking = Ranking.Master_Spotter;
 
-        if (xp >= 37000 && xp < 44000) myRanking = Ranking.Finder;
-        if (xp >= 44000 && xp < 53000) myRanking = Ranking.Pro_Finder;
-        if (xp >= 53000 && xp < 62000) myRanking = Ranking.Master_Finder;
+            if (xp >= 37000 && xp < 44000) myRanking = Ranking.Finder;
+            if (xp >= 44000 && xp < 53000) myRanking = Ranking.Pro_Finder;
+            if (xp >= 53000 && xp < 62000) myRanking = Ranking.Master_Finder;
 
-        if (xp >= 62000 && xp < 70000) myRanking = Ranking.Gatherer;
-        if (xp >= 70000 && xp < 78000) myRanking = Ranking.Pro_Gatherer;
-        if (xp >= 78000 && xp < 87000) myRanking = Ranking.Master_Gatherer;
+            if (xp >= 62000 && xp < 70000) myRanking = Ranking.Gatherer;
+            if (xp >= 70000 && xp < 78000) myRanking = Ranking.Pro_Gatherer;
+            if (xp >= 78000 && xp < 87000) myRanking = Ranking.Master_Gatherer;
 
-        if (xp >= 87000 && xp < 100000) myRanking = Ranking.Forager;
-        if (xp >= 100000 && xp < 110000) myRanking = Ranking.Pro_Forager;
-        if (xp >= 110000 && xp < 130000) myRanking = Ranking.Master_Forager;
+            if (xp >= 87000 && xp < 100000) myRanking = Ranking.Forager;
+            if (xp >= 100000 && xp < 110000) myRanking = Ranking.Pro_Forager;
+            if (xp >= 110000 && xp < 130000) myRanking = Ranking.Master_Forager;
 
-        if (xp >= 130000 && xp < 150000) myRanking = Ranking.Discoverer;
-        if (xp >= 150000 && xp < 175000) myRanking = Ranking.Pro_Discoverer;
-        if (xp >= 175000 && xp < 200000) myRanking = Ranking.Master_Discoverer;
+            if (xp >= 130000 && xp < 150000) myRanking = Ranking.Discoverer;
+            if (xp >= 150000 && xp < 175000) myRanking = Ranking.Pro_Discoverer;
+            if (xp >= 175000 && xp < 200000) myRanking = Ranking.Master_Discoverer;
 
-        if (xp >= 200000 && xp < 250000) myRanking = Ranking.Collector;
-        if (xp >= 250000 && xp < 300000) myRanking = Ranking.Pro_Collector;
-        if (xp >= 300000 && xp < 400000) myRanking = Ranking.Master_Collector;
+            if (xp >= 200000 && xp < 250000) myRanking = Ranking.Collector;
+            if (xp >= 250000 && xp < 300000) myRanking = Ranking.Pro_Collector;
+            if (xp >= 300000 && xp < 400000) myRanking = Ranking.Master_Collector;
 
-        if (xp >= 400000 && xp < 500000) myRanking = Ranking.Hoarder;
-        if (xp >= 500000 && xp < 600000) myRanking = Ranking.Pro_Hoarder;
-        if (xp >= 600000 && xp < 700000) myRanking = Ranking.Master_Hoarder;
+            if (xp >= 400000 && xp < 500000) myRanking = Ranking.Hoarder;
+            if (xp >= 500000 && xp < 600000) myRanking = Ranking.Pro_Hoarder;
+            if (xp >= 600000 && xp < 700000) myRanking = Ranking.Master_Hoarder;
 
-        if (xp >= 700000 && xp < 820000) myRanking = Ranking.Scrounge;
-        if (xp >= 820000 && xp < 1000000) myRanking = Ranking.Pro_Scrounge;
-        if (xp >= 1000000 && xp < 1250000) myRanking = Ranking.Master_Scrounge;
+            if (xp >= 700000 && xp < 820000) myRanking = Ranking.Scrounge;
+            if (xp >= 820000 && xp < 1000000) myRanking = Ranking.Pro_Scrounge;
+            if (xp >= 1000000 && xp < 1250000) myRanking = Ranking.Master_Scrounge;
 
-        if (xp >= 1250000 && xp < 1500000) myRanking = Ranking.Hunter;
-        if (xp >= 1500000 && xp < 1750000) myRanking = Ranking.Pro_Hunter;
-        if (xp >= 1750000 && xp < 2000000) myRanking = Ranking.Master_Hunter;
+            if (xp >= 1250000 && xp < 1500000) myRanking = Ranking.Hunter;
+            if (xp >= 1500000 && xp < 1750000) myRanking = Ranking.Pro_Hunter;
+            if (xp >= 1750000 && xp < 2000000) myRanking = Ranking.Master_Hunter;
 
-        if (xp >= 2000000 && xp < 2500000) myRanking = Ranking.Connoisseur;
-        if (xp >= 2500000 && xp < 3000000) myRanking = Ranking.Pro_Connoisseur;
-        if (xp >= 3000000 && xp < 3750000) myRanking = Ranking.Master_Connoisseur;
+            if (xp >= 2000000 && xp < 2500000) myRanking = Ranking.Connoisseur;
+            if (xp >= 2500000 && xp < 3000000) myRanking = Ranking.Pro_Connoisseur;
+            if (xp >= 3000000 && xp < 3750000) myRanking = Ranking.Master_Connoisseur;
 
-        if (xp >= 3750000 && xp < 4500000) myRanking = Ranking.Curator;
-        if (xp >= 4500000 && xp < 5250000) myRanking = Ranking.Pro_Curator;
-        if (xp >= 5250000 && xp < 6200000) myRanking = Ranking.Master_Curator;
+            if (xp >= 3750000 && xp < 4500000) myRanking = Ranking.Curator;
+            if (xp >= 4500000 && xp < 5250000) myRanking = Ranking.Pro_Curator;
+            if (xp >= 5250000 && xp < 6200000) myRanking = Ranking.Master_Curator;
 
-        if (xp >= 6200000 && xp < 7000000) myRanking = Ranking.Adventurer;
-        if (xp >= 7000000 && xp < 7800000) myRanking = Ranking.Pro_Adventurer;
-        if (xp >= 7800000 && xp < 10000000) myRanking = Ranking.Master_Adventurer;
+            if (xp >= 6200000 && xp < 7000000) myRanking = Ranking.Adventurer;
+            if (xp >= 7000000 && xp < 7800000) myRanking = Ranking.Pro_Adventurer;
+            if (xp >= 7800000 && xp < 10000000) myRanking = Ranking.Master_Adventurer;
 
-        if (xp >= 10000000 && xp < 12000000) myRanking = Ranking.Scavenger;
-        if (xp >= 12000000 && xp < 17000000) myRanking = Ranking.Pro_Scavenger;
-        if (xp >= 17000000 && xp < 20000000) myRanking = Ranking.Master_Scavenger;
+            if (xp >= 10000000 && xp < 12000000) myRanking = Ranking.Scavenger;
+            if (xp >= 12000000 && xp < 17000000) myRanking = Ranking.Pro_Scavenger;
+            if (xp >= 17000000 && xp < 20000000) myRanking = Ranking.Master_Scavenger;
 
-        if (xp >= 20000000 && xp < 30000000) myRanking = Ranking.Mega_Master;
-        if (xp >= 30000000 && xp < 40000000) myRanking = Ranking.Elite_Master;
-        if (xp >= 40000000 && xp < 50000000) myRanking = Ranking.Ultra_Master;
-        if (xp >= 50000000 && xp < 100000000) myRanking = Ranking.Divine_Master;
-        if (xp >= 100000000) myRanking = Ranking.Infinite_Master;
-
+            if (xp >= 20000000 && xp < 30000000) myRanking = Ranking.Mega_Master;
+            if (xp >= 30000000 && xp < 40000000) myRanking = Ranking.Elite_Master;
+            if (xp >= 40000000 && xp < 50000000) myRanking = Ranking.Ultra_Master;
+            if (xp >= 50000000 && xp < 100000000) myRanking = Ranking.Divine_Master;
+            if (xp >= 100000000) myRanking = Ranking.Infinite_Master;
+        }
+        else
+        {//testing in dev mode
+            myRanking = Ranking.DEV;
+        }
 
     }
 

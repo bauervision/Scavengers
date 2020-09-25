@@ -33,11 +33,11 @@ public class PlayerData
 
         // handle all lists
         this.collection = new List<Collectible>();
-        Collectible defaultCollectible = new Collectible("defaultCollectible", 0);
+        Collectible defaultCollectible = new Collectible("Scavenger Spirit!", 0);// keep collection from being empty
         this.collection.Add(defaultCollectible);
 
         this.attachments = new List<Attachment>();
-        Attachment starterGear = new Attachment("starterGear", 0);
+        Attachment starterGear = new Attachment("Starter Gear");
         this.attachments.Add(starterGear);
 
         // create and add all 10 levels

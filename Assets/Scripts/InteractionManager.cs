@@ -37,10 +37,12 @@ public class InteractionManager : MonoBehaviour
     private GameObject levelCanvas;
     private GameObject finalCanvas;
     private GameObject mobileCanvas;
+    private GameObject bestTime;
 
     private Image mainItemSprite;
     private Image bonusItem1Sprite;
     private Image bonusItem2Sprite;
+    private Image finalMainItemSprite;
     private Image finalBonusItem1Sprite;
     private Image finalBonusItem2Sprite;
     private Text GemText;
@@ -68,6 +70,7 @@ public class InteractionManager : MonoBehaviour
     private Text levelDescriptionText;
     private Text nextLevelName;
     private Text finalSpecialText;
+    private Text bestTimeText;
 
     private GameObject finalSpecialPanel;
     private GameObject[] coinList;
@@ -117,6 +120,8 @@ public class InteractionManager : MonoBehaviour
     private int specialPoints = 0;
 
 
+    private PlayerData gamePlayer;
+
     private void Awake()
     {
         // handle testing
@@ -142,6 +147,7 @@ public class InteractionManager : MonoBehaviour
         throwButton = GameObject.Find("ShroomLauncher");
         GoodieBag = GameObject.Find("GoodieBag");
         GoodieBagResult = GameObject.Find("GoodieResult");
+        bestTime = GameObject.Find("BestTimeText");
 
 
 
@@ -167,6 +173,7 @@ public class InteractionManager : MonoBehaviour
         mainItemSprite = GameObject.Find("MainItemSprite").GetComponent<Image>();
         bonusItem1Sprite = GameObject.Find("BonusItem1Sprite").GetComponent<Image>();
         bonusItem2Sprite = GameObject.Find("BonusItem2Sprite").GetComponent<Image>();
+        finalMainItemSprite = GameObject.Find("FinalMain").GetComponent<Image>();
         finalBonusItem1Sprite = GameObject.Find("FinalBonusStar1").GetComponent<Image>();
         finalBonusItem2Sprite = GameObject.Find("FinalBonusStar2").GetComponent<Image>();
 
@@ -197,6 +204,7 @@ public class InteractionManager : MonoBehaviour
         specialText = GameObject.Find("SpecialText").GetComponent<Text>();
         specialText.text = "";
         finalSpecialText = GameObject.Find("TallySpecialText").GetComponent<Text>();
+        bestTimeText = GameObject.Find("BestTimeDataText").GetComponent<Text>();
 
         // now handle game level name update
         GameObject.Find("LevelTitleInitial").GetComponent<Text>().text = thisLevel.ToString();
@@ -397,6 +405,24 @@ public class InteractionManager : MonoBehaviour
         finalSpecialPanel.SetActive(false);
 
         HandleLevelDescriptionUpdate();
+
+        // if we're playing the game, player data comes from the database
+        if (ManagePlayerData.thisPlayer != null)
+        {
+            gamePlayer = ManagePlayerData.thisPlayer;
+            // since have live data, update the best time accordingly
+            if (gamePlayer.availableLevels[(int)thisLevel].bestTimeMinutes != null)
+            {
+                int mins = (int)gamePlayer.availableLevels[(int)thisLevel].bestTimeMinutes;
+                int secs = (int)gamePlayer.availableLevels[(int)thisLevel].bestTimeSeconds;
+                bestTime.SetActive(true);
+                bestTimeText.text = $"{mins}:{secs}";
+            }
+        }
+
+        else // otherwise use Dad's data
+            gamePlayer = new PlayerData("mike@dev.com", "mcb", "Dad", 0);
+
     }
 
     private void SpawnItem()
@@ -464,38 +490,62 @@ public class InteractionManager : MonoBehaviour
         SpawnMysteryChests();
 
     }
-    private void FoundSpecialItem(int itemIndex)
-    {
-        if (!finalSpecialPanel.activeInHierarchy)
-            finalSpecialPanel.SetActive(true);
 
-        int bonusAmount = 0;
-        switch (itemIndex)
-        {
-            case 5: { bonusAmount = 500; break; }
-            case 6: { bonusAmount = 1000; break; }
-            case 10: { bonusAmount = 2500; break; }
-            case 11: { bonusAmount = 3000; break; }
-            case 12: { bonusAmount = 5000; break; }
-            case 13: { bonusAmount = 1500; break; }
-            default: { break; }
-        }
-        specialPoints = specialPoints + bonusAmount;
-        specialText.text = "Special:" + specialPoints;
-    }
     public static void SetItemFound(int itemFound, bool isCollectible, bool isChest)
     {
-        //print("InteractionManager itemFound: " + itemFound + " isCollectible:" + isCollectible + " isChest: " + isChest);
-
+        Collectible newCollectible;
         if (isCollectible)
         {
+            if (!instance.finalSpecialPanel.activeInHierarchy)
+                instance.finalSpecialPanel.SetActive(true);
+
+            int bonusAmount = 0;
+
             switch (itemFound)
             {
-                case 1: { instance.FoundSpecialItem(itemFound); break; } // found the horse
-                case 2: { instance.FoundSpecialItem(itemFound); break; } // found the bear
-                case 3: { instance.FoundSpecialItem(itemFound); break; } // found the ornament
-                case 4: { instance.FoundSpecialItem(itemFound); break; } // found the starfish
+                case 1:
+                    {
+                        bonusAmount = 1000;
+                        instance.gamePlayer.XP += 1000;
+                        ExpManager.UpdateXP(1000);
+
+                        newCollectible = new Collectible("Wooden Horse", 1);
+                        instance.gamePlayer.collection.Add(newCollectible);
+                        break;
+                    }
+                case 2:
+                    {
+                        bonusAmount = 2500;
+                        instance.gamePlayer.XP += 2500;
+                        ExpManager.UpdateXP(2500);// found the bear
+
+                        newCollectible = new Collectible("Toy Bear", 2);
+                        instance.gamePlayer.collection.Add(newCollectible);
+                        break;
+                    }
+                case 3:
+                    {
+                        bonusAmount = 5000;
+                        instance.gamePlayer.XP += 5000;
+                        ExpManager.UpdateXP(5000);// found the ornament
+
+                        newCollectible = new Collectible("Ornament", 3);
+                        instance.gamePlayer.collection.Add(newCollectible);
+                        break;
+                    }
+                case 4:
+                    {
+                        bonusAmount = 10000;
+                        instance.gamePlayer.XP += 10000;
+                        ExpManager.UpdateXP(10000);// found the starfish
+
+                        newCollectible = new Collectible("Starfish", 4);
+                        instance.gamePlayer.collection.Add(newCollectible);
+                        break;
+                    }
             }
+            instance.specialPoints = instance.specialPoints + bonusAmount;
+            instance.specialText.text = "Special:" + instance.specialPoints;
         }
         else
         {
@@ -509,12 +559,49 @@ public class InteractionManager : MonoBehaviour
                 switch (itemFound)
                 {
                     // main level items
-                    case 0: { foundMountainBlood = true; break; }
-                    case 1: { instance.levelBonusItemScore++; instance.bonusItem1Sprite.sprite = instance.foundSprite; instance.foundBonus1 = true; break; }
-                    case 2: { instance.levelBonusItemScore++; instance.bonusItem2Sprite.sprite = instance.foundSprite; instance.foundBonus2 = true; break; }
+                    case 0:
+                        {
+                            instance.mainItemSprite.sprite = instance.foundSprite;
+                            foundMountainBlood = true;
+                            instance.gamePlayer.XP += 1000;
+                            ExpManager.UpdateXP(1000);
+                            instance.gamePlayer.availableLevels[(int)instance.thisLevel].hasCompleted = true;
+                            break;
+                        }
+                    case 1:
+                        {
+                            instance.gamePlayer.XP += 500;
+                            ExpManager.UpdateXP(500);
+                            instance.levelBonusItemScore++;
+                            instance.bonusItem1Sprite.sprite = instance.foundSprite;
+                            instance.foundBonus1 = true;
+                            instance.gamePlayer.availableLevels[(int)instance.thisLevel].foundCrystal1 = true;
+                            break;
+                        }
+                    case 2:
+                        {
+                            instance.gamePlayer.XP += 500;
+                            ExpManager.UpdateXP(500);
+                            instance.levelBonusItemScore++;
+                            instance.bonusItem2Sprite.sprite = instance.foundSprite;
+                            instance.foundBonus2 = true;
+                            instance.gamePlayer.availableLevels[(int)instance.thisLevel].foundCrystal2 = true;
+                            break;
+                        }
                     // collectibles
-                    case 3: { instance.levelCoinCount++; break; }
-                    case 4: { instance.levelGemCount++; break; }
+                    case 3:
+                        {
+                            instance.gamePlayer.XP += 1;
+                            ExpManager.UpdateXP(1);
+                            instance.levelCoinCount++;
+                            break;
+                        }
+                    case 4:
+                        {
+                            instance.gamePlayer.XP += 5;
+                            ExpManager.UpdateXP(5);
+                            instance.levelGemCount++; break;
+                        }
                     //case 5: { instance.FoundMysteryChest(itemFound); break; }//found the chest
                     case 6: { instance.SetPoisoned(false); break; }//potion
                     case 7: { break; }//jug
@@ -556,9 +643,58 @@ public class InteractionManager : MonoBehaviour
     }
 
 
+    private string GetNextLevelName(int index)
+    {
+        // unlock the next level
+        instance.gamePlayer.availableLevels[index].available = true;
+        // grab its name and return it
+        CurrentLevel nextLevel = (CurrentLevel)index;
+        return nextLevel.ToString();
+    }
+
+
+    private void SetNewBestTime()
+    {
+        instance.gamePlayer.availableLevels[(int)instance.thisLevel].bestTimeMinutes = finalMinutes;
+        instance.gamePlayer.availableLevels[(int)instance.thisLevel].bestTimeMinutes = finalMinutes;
+    }
+
+
+    private void HandleBestTime()
+    {
+        int currentLevelIndex = (int)instance.thisLevel;
+
+        // Now let's set the best time for this level
+        // if it is null, then this is the first time playing the level so just save it
+        if (instance.gamePlayer.availableLevels[currentLevelIndex] == null)
+            instance.SetNewBestTime();
+        else // if it isn't null, then have a best time saved, so compare it
+        {
+            if (finalMinutes < instance.gamePlayer.availableLevels[currentLevelIndex].bestTimeMinutes)
+            {
+                // if current final minutes is simply less than what is saved
+                instance.SetNewBestTime();
+            }
+            else if (finalMinutes == instance.gamePlayer.availableLevels[currentLevelIndex].bestTimeMinutes)
+            {
+                // if final minutes and saved minutes is the same then we do a final compare on the seconds
+                if (finalSeconds < instance.gamePlayer.availableLevels[currentLevelIndex].bestTimeSeconds)
+                {
+                    // finalSeconds is simply less than saved seconds
+                    instance.SetNewBestTime();
+                }
+            }
+        }
+    }
+
     public static void LevelCompleted()
     {
-        instance.mainItemSprite.sprite = instance.foundSprite;
+        // find out what the next level is
+        int nextLevelIndex = (int)instance.thisLevel + 1;// TODO: handle the last level
+        // set its name in the data
+        instance.gamePlayer.availableLevels[nextLevelIndex].name = instance.GetNextLevelName(nextLevelIndex);
+
+
         instance.finalCanvas.SetActive(true);
         instance.gameCanvas.SetActive(false);
         instance.gameController.GetComponent<Invector.vGameController>().enabled = false;
@@ -566,13 +702,32 @@ public class InteractionManager : MonoBehaviour
         instance.gameCamera.transform.gameObject.SetActive(false);
         ControlFreak2.CFCursor.visible = true;
         ControlFreak2.CFCursor.lockState = CursorLockMode.None;
-        // perform tally calculations
         instance.CalculateLevelPoints();
+        instance.HandleBestTime();
+
+
+        instance.HandleCollectiblesForSave();
+        instance.HandleAttachmentsForSave();
+
+        instance.HandleGreatestItemCompare();
+
+        // if we are actually playing the game, save the data
+        // TODO: handle anonymous login
+
 
         //stop timer
         PuzzleTimer.instance.finished = true;
-        // unlock the next level
-        LevelLoader.instance.UnlockNextLevel();
+        // // unlock the next level
+        // LevelLoader.instance.UnlockNextLevel();
+
+        if (ManagePlayerData.thisPlayer != null)
+        {
+            ManagePlayerData.SavePlayer(instance.gamePlayer);
+        }
+        else // testing levels without real PlayerData
+        {
+            print(JsonUtility.ToJson(instance.gamePlayer));
+        }
     }
 
     private int HandleTimeScore()
@@ -591,18 +746,41 @@ public class InteractionManager : MonoBehaviour
         }
     }
 
+
+    private void HandleCollectiblesForSave()
+    {
+        // check for all items found and mark them as saved
+        foreach (Collectible item in gamePlayer.collection)
+            item.saved = true;
+    }
+
+    private void HandleAttachmentsForSave()
+    {
+        // check for all items found and mark them as saved
+        foreach (Attachment item in gamePlayer.attachments)
+            item.saved = true;
+    }
+
+    private void HandleGreatestItemCompare()
+    {
+        // check to see what player found in this level and compare to see if its the best
+        instance.gamePlayer.collection.Sort((c1, c2) => c2.collectibleRank.CompareTo(c1.collectibleRank));
+        instance.gamePlayer.greatestItem = instance.gamePlayer.collection[0].name;
+    }
     private void CalculateLevelPoints()
     {
         // coins are 1 point each, gems are 5 pts each
         int collectibleScore = levelCoinCount + (levelGemCount * 5);
 
         // handle bonus items
-        int itemScore = (levelBonusItemScore * 50) + 100; // 100 is for getting the main item
+        int itemScore = (levelBonusItemScore * 500) + 1000; // 1000 is for getting the main item
         if (foundBonus1)
             finalBonusItem1Sprite.sprite = foundSprite;
 
         if (foundBonus2)
             finalBonusItem2Sprite.sprite = foundSprite;
+
+        finalMainItemSprite.sprite = foundSprite;// no need to check anything, if we get here, we got it
 
         // time
         int timeScore = HandleTimeScore();
@@ -646,8 +824,16 @@ public class InteractionManager : MonoBehaviour
         // finally set the total score
         finalScoreText.text = "Total: " + levelTotalPoints.ToString();
 
+        instance.HandleHighScore(levelTotalPoints);
     }
 
+
+    private void HandleHighScore(int levelScore)
+    {
+        // check to make sure we need to update the data
+        if (levelScore > instance.gamePlayer.availableLevels[(int)instance.thisLevel].highScore)
+            instance.gamePlayer.availableLevels[(int)instance.thisLevel].highScore = levelScore;
+    }
 
     private void SetPoisoned(bool state)
     {
