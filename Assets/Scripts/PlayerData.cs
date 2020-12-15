@@ -28,7 +28,7 @@ public class PlayerData
         this.rank = 0;
         this.rankString = "Noob";
         this.XP = 0;
-        this.greatestItem = "nothing yet";
+        this.greatestItem = "Nothing yet";
         this.dateJoined = 0;
 
         // handle all lists

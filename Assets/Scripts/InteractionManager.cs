@@ -121,6 +121,7 @@ public class InteractionManager : MonoBehaviour
 
 
     private PlayerData gamePlayer;
+    private bool haloEnabled = false;
 
     private void Awake()
     {
@@ -340,10 +341,21 @@ public class InteractionManager : MonoBehaviour
     }
     private void EnableHalo()
     {
+        haloEnabled = true;
         GoodieBagUIText.text = goodieBag[2];
         foreach (GameObject dropzone in spawnLocations)
         {
             dropzone.GetComponentInChildren<Light>().enabled = true;
+        }
+    }
+
+    public static void DisableHalo()
+    {
+        if (instance.haloEnabled)
+        {
+            instance.GoodieBagUIText.text = "";
+            foreach (GameObject dropzone in instance.spawnLocations)
+                dropzone.GetComponentInChildren<Light>().enabled = false;
         }
     }
 
@@ -407,9 +419,9 @@ public class InteractionManager : MonoBehaviour
         HandleLevelDescriptionUpdate();
 
         // if we're playing the game, player data comes from the database
-        if (ManagePlayerData.thisPlayer != null)
+        if (HandleFirebase.instance != null)
         {
-            gamePlayer = ManagePlayerData.thisPlayer;
+            gamePlayer = HandleFirebase.instance.thisPlayer;
             // since have live data, update the best time accordingly
             if (gamePlayer.availableLevels[(int)thisLevel].bestTimeMinutes != null)
             {
@@ -420,8 +432,12 @@ public class InteractionManager : MonoBehaviour
             }
         }
 
-        else // otherwise use Dad's data
+        else
+        {
+            // otherwise use Dad's data
+            print("Dad's playing");
             gamePlayer = new PlayerData("mike@dev.com", "mcb", "Dad", 0);
+        }
 
     }
 
@@ -441,7 +457,7 @@ public class InteractionManager : MonoBehaviour
             chest.SetActive(false);
         }
         // now enable only the one we chose
-        mysteryLocations[chosenMysteryIndex].SetActive(true);
+        mysteryLocations[chosenMysteryIndex]?.SetActive(true);
     }
 
     private void FoundMysteryChest(int itemIndex)
@@ -561,6 +577,7 @@ public class InteractionManager : MonoBehaviour
                     // main level items
                     case 0:
                         {
+                            // mountain blood
                             instance.mainItemSprite.sprite = instance.foundSprite;
                             foundMountainBlood = true;
                             instance.gamePlayer.XP += 1000;
@@ -700,8 +717,6 @@ public class InteractionManager : MonoBehaviour
         instance.gameController.GetComponent<Invector.vGameController>().enabled = false;
         instance.uiCamera.transform.gameObject.SetActive(true);
         instance.gameCamera.transform.gameObject.SetActive(false);
-        ControlFreak2.CFCursor.visible = true;
-        ControlFreak2.CFCursor.lockState = CursorLockMode.None;
         instance.CalculateLevelPoints();
         instance.HandleBestTime();
 
@@ -720,9 +735,9 @@ public class InteractionManager : MonoBehaviour
         // // unlock the next level
         // LevelLoader.instance.UnlockNextLevel();
 
-        if (ManagePlayerData.thisPlayer != null)
+        if (HandleFirebase.instance.thisPlayer != null)
         {
-            ManagePlayerData.SavePlayer(instance.gamePlayer);
+            HandleFirebase.SavePlayer(instance.gamePlayer);
         }
         else // testing levels without real PlayerData
         {
@@ -845,7 +860,7 @@ public class InteractionManager : MonoBehaviour
     {
 
         GoodieBagStamina.SetActive(hasStamina);
-        if (ControlFreak2.CF2Input.GetKey(KeyCode.Escape))
+        if (Input.GetKey(KeyCode.Escape))
         {
             ReturnToLaunch();
         }
@@ -855,7 +870,7 @@ public class InteractionManager : MonoBehaviour
         CoinText.text = instance.levelCoinCount.ToString() + " / " + coinList.Length;
         SeedCountText.text = currentSeedCount.ToString();
 
-        if (ControlFreak2.CF2Input.GetKey(KeyCode.P))
+        if (Input.GetKey(KeyCode.P))
         {
             EnableRadar();
         }

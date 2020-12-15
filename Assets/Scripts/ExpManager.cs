@@ -140,20 +140,20 @@ public class ExpManager : MonoBehaviour
 
     public static void UpdateXP(int xpIncrease)
     {
-        if (ManagePlayerData.thisPlayer != null)
+        if (HandleFirebase.instance?.thisPlayer != null)
         {
-            ManagePlayerData.thisPlayer.XP += xpIncrease;
+            HandleFirebase.instance.thisPlayer.XP += xpIncrease;
         }
     }
     private void Start()
     {
         instance = this;
-        if (ManagePlayerData.thisPlayer != null)
+        if (HandleFirebase.instance != null)
         {
-            myRanking = (Ranking)ManagePlayerData.thisPlayer.rank;
+            myRanking = (Ranking)HandleFirebase.instance.thisPlayer.rank;
         }
         savingText.text = "";
-        //StartCoroutine(AutoSave());
+
     }
 
     private void Update()
@@ -164,20 +164,20 @@ public class ExpManager : MonoBehaviour
         MonitorRanking();
 
         // make sure we have playerData first
-        if (ManagePlayerData.thisPlayer != null)
+        if (HandleFirebase.instance != null)
         {
             nextLevel = nextLevelPoints[(int)myRanking];
 
             //keep xpText updated with current xp value
-            XpText.text = $"XP: {ManagePlayerData.thisPlayer.XP}/{nextLevel}\nRank:{myRanking}";
+            XpText.text = $"XP: {HandleFirebase.instance.thisPlayer.XP}/{nextLevel}\nRank:{myRanking}";
         }
     }
 
     private void MonitorRanking()
     {
-        if (ManagePlayerData.thisPlayer != null)
+        if (HandleFirebase.instance != null)
         {
-            double xp = ManagePlayerData.thisPlayer.XP;
+            double xp = HandleFirebase.instance.thisPlayer.XP;
             // will probably break this out further into color levels for each stage
             if (xp < 5000) myRanking = Ranking.Noob;
             if (xp >= 5000 && xp < 10000) myRanking = Ranking.Pro;
@@ -255,7 +255,7 @@ public class ExpManager : MonoBehaviour
         yield return new WaitForSeconds(4f);
         savingText.text = "Saving...";
         // turn on save icon
-        ManagePlayerData.instance.SavePlayerData();
+        //HandleFirebase.SavePlayer();
 
 
         savingText.text = "";

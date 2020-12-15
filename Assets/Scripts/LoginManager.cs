@@ -27,6 +27,8 @@ public class LoginManager : MonoBehaviour
     void Start()
     {
         instance = this;
+        // check to see if we have a logged in user
+
         loginScreen.SetActive(false);
         createScreen.SetActive(false);
         characterScreen.SetActive(false);
@@ -80,15 +82,19 @@ public class LoginManager : MonoBehaviour
 
     public void ShowCharacterScreen()
     {
-        PlayerData currentPlayer = ManagePlayerData.thisPlayer;
-        createScreen.SetActive(false);
-        characterScreen.SetActive(true);
-        loginScreen.SetActive(false);
-        characterSelectButton.SetActive(false);
-        characterSelectText.text = "Select Character";
-        // set things based on the loaded data
-        userTitle.text = $"Welcome back {currentPlayer.name}";
-        currentData.text = $"{currentPlayer.XP}\n{currentPlayer.rankString}\n{currentPlayer.greatestItem}";
+        if (HandleFirebase.instance.thisPlayer != null)
+        {
+            PlayerData currentPlayer = HandleFirebase.instance.thisPlayer;
+            createScreen.SetActive(false);
+            characterScreen.SetActive(true);
+            loginScreen.SetActive(false);
+            characterSelectButton.SetActive(false);
+            characterSelectText.text = "Select Character";
+            // set things based on the loaded data
+            userTitle.text = $"Welcome back {currentPlayer.name}";
+            currentData.text = $"{currentPlayer.XP}\n{currentPlayer.rankString}\n{currentPlayer.greatestItem}";
+        }
+
 
     }
 
@@ -119,10 +125,19 @@ public class LoginManager : MonoBehaviour
 
     public void ShowCharacterScreenNew()
     {
-        instance.createScreen.SetActive(false);
-        instance.characterScreenNew.SetActive(true);
-        instance.loginScreen.SetActive(false);
-        instance.characterSelectButton.SetActive(false);
+        if (HandleFirebase.instance.thisPlayer != null)
+        {
+            print("thisPlayer = " + HandleFirebase.instance.thisPlayer.name);
+            instance.createScreen.SetActive(false);
+            instance.characterScreenNew.SetActive(true);
+            instance.loginScreen.SetActive(false);
+            instance.characterSelectButton.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("thisPlayer = NULL");
+        }
+
 
     }
 

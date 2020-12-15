@@ -9,19 +9,19 @@ public class RegistrationFlow : MonoBehaviour
 {
     public static RegistrationFlow instance;
 
-    [SerializeField] private InputField _nameField;
-    [SerializeField] private InputField _emailField;
-    [SerializeField] private InputField _passwordField;
-    [SerializeField] private InputField _passwordFieldConfirm;
-    [SerializeField] private Button _registerUser;
-    [SerializeField] private Button _loginUser;
-    [SerializeField] private Text _newUserTitle;
-    [SerializeField] public Text _emailFormText;
-    [SerializeField] public Text _warningText;
+    [SerializeField] private InputField _nameField = null;
+    [SerializeField] private InputField _emailField = null;
+    [SerializeField] private InputField _passwordField = null;
+    [SerializeField] private InputField _passwordFieldConfirm = null;
+    [SerializeField] private Button _registerUser = null;
+    [SerializeField] private Button _loginUser = null;
+    [SerializeField] private Text _newUserTitle = null;
+    [SerializeField] public Text _emailFormText = null;
+    [SerializeField] public Text _warningText = null;
 
 
-    [SerializeField] private InputField _returningEmailField;
-    [SerializeField] private InputField _returningPasswordField;
+    [SerializeField] private InputField _returningEmailField = null;
+    [SerializeField] private InputField _returningPasswordField = null;
 
     public string Name => _nameField.text;
     private string Email => _emailField.text;

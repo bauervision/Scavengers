@@ -77,7 +77,7 @@ public class Item : MonoBehaviour
 
 };
 
-    private float fadeDuration = 2f;
+
 
     private void HandleCollectibles()
     {
@@ -157,7 +157,7 @@ public class Item : MonoBehaviour
             Notificatons.ShowNotification(message, baseDuration);
             guideMessage = "You have found the mysyterious Mountain Blood, now you are trying to locate the heart of the island.  See if you can find anything similiar to the Mountain Blood around the island. Maybe...the same color, or texture...";
             Guide.UpdateGuide(guideMessage);
-
+            InteractionManager.DisableHalo();
         }
         if (myType == ItemType.IslandHeart)
         {
@@ -287,16 +287,12 @@ public class Item : MonoBehaviour
         // disable the collider on this object right away
         gameObject.GetComponent<SphereCollider>().enabled = state;
 
-        // the mountain blood doesn't have a child mesh renderer
-        if (myType != ItemType.Main)
+        if (myType != ItemType.IslandHeart)//islandheart has nothing to hide
         {
-            //hide the mesh of the child "core"
             if (transform.childCount > 0)
                 transform.GetChild(0).GetComponent<MeshRenderer>().enabled = state;
-        }
-        else if (myType != ItemType.IslandHeart)//islandheart has nothing to hide
-        {
-            gameObject.GetComponent<MeshRenderer>().enabled = state;
+            else
+                gameObject.GetComponent<MeshRenderer>().enabled = state;
         }
 
     }
@@ -304,31 +300,30 @@ public class Item : MonoBehaviour
     private void Update()
     {
         // turn this items on if they arent already
-        if (!gameObject.activeInHierarchy)
+        // if (!gameObject.activeInHierarchy)
+        // {
+        HandleCollectibles();
+
+        //show this object only if we are poisoned
+        if (myType == ItemType.Potion)
         {
-            HandleCollectibles();
-
-            //show this object only if we are poisoned
-            if (myType == ItemType.Potion)
-            {
-                EnableThisObject(InteractionManager.instance.speedReduced);
-            }
-
-            //show this object only if we have stamina, but not if we're poisoned
-            if (myType == ItemType.Jug && (InteractionManager.instance.hasStamina && !InteractionManager.instance.speedReduced))
-            {
-                EnableThisObject(true);
-            }
-
-
-            if (myType == ItemType.Halo)
-            {
-                if (PuzzleTimer.instance.timeMinutes > 3)
-                {
-                    EnableThisObject(true);
-                }
-            }
+            EnableThisObject(InteractionManager.instance.speedReduced);
         }
+
+        //show this object only if we have stamina, but not if we're poisoned
+        if (myType == ItemType.Jug && (InteractionManager.instance.hasStamina && !InteractionManager.instance.speedReduced))
+        {
+            EnableThisObject(true);
+        }
+
+
+        if (myType == ItemType.Halo)
+            if (!gameObject.GetComponent<MeshRenderer>().enabled)
+                if (PuzzleTimer.instance.timeMinutes > 2)
+                    EnableThisObject(true);
+
+
+
 
         if (willSpin)
         {

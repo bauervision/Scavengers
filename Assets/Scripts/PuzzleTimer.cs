@@ -36,10 +36,10 @@ public class PuzzleTimer : MonoBehaviour
 
 
         float t = Time.time - startTime;
-        timeMinutes = ((int)t / 60);
-        timeSeconds = (int)(t % 60);
+        timeMinutes = Mathf.FloorToInt(t / 60);
+        timeSeconds = Mathf.FloorToInt(t % 60);
 
-        timerText.text = timeMinutes.ToString() + ":" + timeSeconds.ToString("f0");
+        timerText.text = string.Format("{0:00}:{1:00}", timeMinutes, timeSeconds);
     }
 
 }
