@@ -1,6 +1,4 @@
 using UnityEngine;
-using Firebase;
-using Firebase.Extensions;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System.Collections;
@@ -12,8 +10,8 @@ public class MusicPlayer : MonoBehaviour
 
     private void Update()
     {
-        if (HandleFirebase.instance.userSignedIn && CameraAudioSource.isPlaying == false)
-            HandleAddressablesAudio();
+        //if (HandleFirebase.instance.userSignedIn && CameraAudioSource.isPlaying == false)
+        HandleAddressablesAudio();
     }
 
     public void HandleAddressablesAudio()

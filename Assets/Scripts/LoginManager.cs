@@ -7,6 +7,7 @@ public class LoginManager : MonoBehaviour
 {
     public static LoginManager instance;
     public GameObject initialScreen;
+    public GameObject accountOptions;
     public GameObject loginScreen;
     public GameObject createScreen;
     public GameObject characterScreen;
@@ -42,7 +43,7 @@ public class LoginManager : MonoBehaviour
     public void ShowCreateScreen()
     {
         createScreen.SetActive(true);
-        initialScreen.SetActive(false);
+        accountOptions.SetActive(false);
     }
 
     public void ReturnCharacterScreen()
@@ -76,15 +77,16 @@ public class LoginManager : MonoBehaviour
     public void ShowLoginScreen()
     {
         loginScreen.SetActive(true);
-        initialScreen.SetActive(false);
+        accountOptions.SetActive(false);
     }
 
 
-    public void ShowCharacterScreen()
+    public void ShowCharacterScreen(PlayerData loggedInPlayerData)
     {
-        if (HandleFirebase.instance.thisPlayer != null)
+
+        if (loggedInPlayerData != null)
         {
-            PlayerData currentPlayer = HandleFirebase.instance.thisPlayer;
+            PlayerData currentPlayer = loggedInPlayerData;
             createScreen.SetActive(false);
             characterScreen.SetActive(true);
             loginScreen.SetActive(false);
@@ -93,6 +95,10 @@ public class LoginManager : MonoBehaviour
             // set things based on the loaded data
             userTitle.text = $"Welcome back {currentPlayer.name}";
             currentData.text = $"{currentPlayer.XP}\n{currentPlayer.rankString}\n{currentPlayer.greatestItem}";
+        }
+        else
+        {
+            Debug.LogError("PlayerData = NULL");
         }
 
 
@@ -113,9 +119,9 @@ public class LoginManager : MonoBehaviour
     }
 
 
-    public void ShowInitialScreen()
+    public void ShowaccountOptions()
     {
-        initialScreen.SetActive(true);
+        accountOptions.SetActive(true);
         loginScreen.SetActive(false);
         createScreen.SetActive(false);
         characterScreen.SetActive(false);
@@ -123,20 +129,41 @@ public class LoginManager : MonoBehaviour
         levelScreen.SetActive(false);
     }
 
+    public void ShowInitialScreen()
+    {
+        instance.initialScreen.SetActive(true);
+        instance.accountOptions.SetActive(true);
+        instance.loginScreen.SetActive(false);
+        instance.createScreen.SetActive(false);
+        instance.characterScreen.SetActive(false);
+        instance.characterScreenNew.SetActive(false);
+        instance.levelScreen.SetActive(false);
+    }
+    public static void AfterSignout()
+    {
+        instance.initialScreen.SetActive(true);
+        instance.accountOptions.SetActive(true);
+        instance.loginScreen.SetActive(false);
+        instance.createScreen.SetActive(false);
+        instance.characterScreen.SetActive(false);
+        instance.characterScreenNew.SetActive(false);
+        instance.levelScreen.SetActive(false);
+    }
+
     public void ShowCharacterScreenNew()
     {
-        if (HandleFirebase.instance.thisPlayer != null)
-        {
-            print("thisPlayer = " + HandleFirebase.instance.thisPlayer.name);
-            instance.createScreen.SetActive(false);
-            instance.characterScreenNew.SetActive(true);
-            instance.loginScreen.SetActive(false);
-            instance.characterSelectButton.SetActive(false);
-        }
-        else
-        {
-            Debug.LogError("thisPlayer = NULL");
-        }
+        // if (HandleFirebase.instance.thisPlayer != null)
+        // {
+        //print("thisPlayer = " + HandleFirebase.instance.thisPlayer.name);
+        instance.createScreen.SetActive(false);
+        instance.characterScreenNew.SetActive(true);
+        instance.loginScreen.SetActive(false);
+        instance.characterSelectButton.SetActive(false);
+        // }
+        // else
+        // {
+        //     Debug.LogError("thisPlayer = NULL");
+        // }
 
 
     }

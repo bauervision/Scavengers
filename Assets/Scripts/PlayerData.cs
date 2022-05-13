@@ -1,18 +1,19 @@
 using UnityEngine;
 using System.Collections;
+using System;
 using System.Collections.Generic;
 
 [System.Serializable]
 public class PlayerData
 {
-    public string userId;
+    public string userPin;
     public string name;
     public string email;
     public int rank;//save as int to convert to Ranking later
     public string rankString;
     public double XP;
     public string greatestItem;
-    public ulong dateJoined;
+    public DateTime dateJoined;
     public List<Collectible> collection;
     public List<Attachment> attachments;
 
@@ -20,16 +21,15 @@ public class PlayerData
 
 
 
-    public PlayerData(string email, string userId, string name, ulong date)
+    public PlayerData(string pin, string name)
     {
-        this.userId = userId;
+        this.userPin = pin;
         this.name = name;
-        this.email = email;
         this.rank = 0;
         this.rankString = "Noob";
         this.XP = 0;
         this.greatestItem = "Nothing yet";
-        this.dateJoined = 0;
+        this.dateJoined = DateTime.Now;
 
         // handle all lists
         this.collection = new List<Collectible>();
@@ -42,13 +42,10 @@ public class PlayerData
 
         // create and add all 10 levels
         this.availableLevels = new List<Level>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < LevelLoader.instance.levelNames.Length; i++)
         {
             Level newLevel;
-            if (i == 0)
-                newLevel = new Level("Isle of Noob");
-            else
-                newLevel = new Level("Unknown");
+            newLevel = new Level(LevelLoader.instance.levelNames[i]);
 
             this.availableLevels.Add(newLevel);
         }

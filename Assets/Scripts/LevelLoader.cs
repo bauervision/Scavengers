@@ -32,15 +32,6 @@ public class LevelLoader : MonoBehaviour
 
     private void Awake()
     {
-        Level_1 = GameObject.Find("Level1Button").GetComponent<Button>();
-        Level_2 = GameObject.Find("Level2Button").GetComponent<Button>();
-        Level_3 = GameObject.Find("Level3Button").GetComponent<Button>();
-        Level_4 = GameObject.Find("Level4Button").GetComponent<Button>();
-        Level_5 = GameObject.Find("Level5Button").GetComponent<Button>();
-        Level_6 = GameObject.Find("Level6Button").GetComponent<Button>();
-        Level_7 = GameObject.Find("Level7Button").GetComponent<Button>();
-        Level_8 = GameObject.Find("Level8Button").GetComponent<Button>();
-        Level_9 = GameObject.Find("Level9Button").GetComponent<Button>();
 
         // add all of our found level buttons to our array
         buttonList = new Button[] { Level_1, Level_2, Level_3, Level_4, Level_5, Level_6, Level_7, Level_8, Level_9 };
@@ -62,25 +53,25 @@ public class LevelLoader : MonoBehaviour
 
     public static void SetAvailableLevels()
     {
-        if (HandleFirebase.instance.thisPlayer != null)
+        // if (HandleFirebase.instance.thisPlayer != null)
+        // {
+        //     var currentAvailable = HandleFirebase.instance.thisPlayer.availableLevels;
+
+        for (int i = 0; i < instance.buttonList.Length; i++)
         {
-            var currentAvailable = HandleFirebase.instance.thisPlayer.availableLevels;
+            // // set the availability of the level button
+            // instance.buttonList[i].interactable = currentAvailable[i].available;
+            // // set the level name of the button
+            // instance.buttonList[i].transform.GetChild(1).GetComponent<Text>().text = currentAvailable[i].name;
+            // // set the stars, by grabbing the "stars" gameobject
+            // GameObject starsObj = instance.buttonList[i].transform.GetChild(3).gameObject;
+            // // now run through each of its children, the stars, and set their state
+            // starsObj.transform.GetChild(0).GetComponent<Image>().sprite = currentAvailable[i].hasCompleted ? instance.foundSprite : instance.defaultSprite;
+            // starsObj.transform.GetChild(1).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal1 ? instance.foundSprite : instance.defaultSprite;
+            // starsObj.transform.GetChild(2).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal2 ? instance.foundSprite : instance.defaultSprite;
 
-            for (int i = 0; i < instance.buttonList.Length; i++)
-            {
-                // set the availability of the level button
-                instance.buttonList[i].interactable = currentAvailable[i].available;
-                // set the level name of the button
-                instance.buttonList[i].transform.GetChild(1).GetComponent<Text>().text = currentAvailable[i].name;
-                // set the stars, by grabbing the "stars" gameobject
-                GameObject starsObj = instance.buttonList[i].transform.GetChild(3).gameObject;
-                // now run through each of its children, the stars, and set their state
-                starsObj.transform.GetChild(0).GetComponent<Image>().sprite = currentAvailable[i].hasCompleted ? instance.foundSprite : instance.defaultSprite;
-                starsObj.transform.GetChild(1).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal1 ? instance.foundSprite : instance.defaultSprite;
-                starsObj.transform.GetChild(2).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal2 ? instance.foundSprite : instance.defaultSprite;
-
-            }
         }
+        // }
 
 
     }

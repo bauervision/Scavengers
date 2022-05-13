@@ -8,9 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/StartMenu.unity
     guid: 2e853c2a69429054da472167f45de90f
-  - enabled: 0
-    path: Assets/Scenes/Isle of Noob.unity
-    guid: d91e91b9ba482ca40b546f494c2a1e46
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9d8d6f7864e41824d8d1b7d6c243fc4c,
       type: 2}

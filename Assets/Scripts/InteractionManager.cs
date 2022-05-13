@@ -394,7 +394,6 @@ public class InteractionManager : MonoBehaviour
         coinList = GameObject.FindGameObjectsWithTag("Coin");
         gemList = GameObject.FindGameObjectsWithTag("Gem");
 
-
         gameCanvas.SetActive(isDevelopmentTest);
         initialCanvas.SetActive(!isDevelopmentTest);
 
@@ -419,9 +418,9 @@ public class InteractionManager : MonoBehaviour
         HandleLevelDescriptionUpdate();
 
         // if we're playing the game, player data comes from the database
-        if (HandleFirebase.instance != null)
+        if (DataManager.instance != null)
         {
-            gamePlayer = HandleFirebase.instance.thisPlayer;
+            gamePlayer = DataManager.instance.playerData;
             // since have live data, update the best time accordingly
             if (gamePlayer.availableLevels[(int)thisLevel].bestTimeMinutes != null)
             {
@@ -436,7 +435,7 @@ public class InteractionManager : MonoBehaviour
         {
             // otherwise use Dad's data
             print("Dad's playing");
-            gamePlayer = new PlayerData("mike@dev.com", "mcb", "Dad", 0);
+            gamePlayer = new PlayerData("1111", "Dad");
         }
 
     }
@@ -735,14 +734,14 @@ public class InteractionManager : MonoBehaviour
         // // unlock the next level
         // LevelLoader.instance.UnlockNextLevel();
 
-        if (HandleFirebase.instance.thisPlayer != null)
-        {
-            HandleFirebase.SavePlayer(instance.gamePlayer);
-        }
-        else // testing levels without real PlayerData
-        {
-            print(JsonUtility.ToJson(instance.gamePlayer));
-        }
+        // if (HandleFirebase.instance.thisPlayer != null)
+        // {
+        //     HandleFirebase.SavePlayer(instance.gamePlayer);
+        // }
+        // else // testing levels without real PlayerData
+        // {
+        print(JsonUtility.ToJson(instance.gamePlayer));
+        // }
     }
 
     private int HandleTimeScore()
