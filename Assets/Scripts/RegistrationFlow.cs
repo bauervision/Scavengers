@@ -20,7 +20,8 @@ public class RegistrationFlow : MonoBehaviour
     [SerializeField] private InputField _returningPinField = null;
 
     public string Name => _nameField.text;
-    private string Pin => _pinField.text;
+    public string Pin => _pinField.text;
+    public string ConfirmPin => _pinFieldConfirm.text;
 
     private string UserPin => _returningPinField.text;
 
@@ -35,7 +36,7 @@ public class RegistrationFlow : MonoBehaviour
 
 
 
-    public enum FormState { Name, Pin, PinsDontMatch, Ok, ExistingEmail };
+    public enum FormState { Name, Pin, PinsDontMatch, Ok };
 
     public static FormState myForm;
 
@@ -45,16 +46,15 @@ public class RegistrationFlow : MonoBehaviour
 
     public static string staticName;
 
-    private static string previousEmail;
 
     private void Start()
     {
         instance = this;
 
-        _nameField.onEndEdit.AddListener(HandleValueChanged);
+        _nameField.onEndEdit.AddListener(HandleNameChanged);
 
-        _pinField.onEndEdit.AddListener(HandleValueChanged);
-        _pinFieldConfirm.onValueChanged.AddListener(HandleValueChanged);
+        _pinField.onEndEdit.AddListener(HandlePinChanged);
+        _pinFieldConfirm.onEndEdit.AddListener(HandlePinConfirmChanged);
 
         _returningPinField.onValueChanged.AddListener(HandleValueChangedReturning);
 
@@ -69,19 +69,33 @@ public class RegistrationFlow : MonoBehaviour
 
     public void HandleRegisterUser()
     {
-        //HandleFirebase.SendNewRegistration(Name, Email, Password);
+        DataManager.instance.SaveNewUserData(Pin, Name);
+        SuccessfulRegistration();
     }
 
-    public static void SuccessfulRegistration(string name)
+    public void SuccessfulRegistration()
     {
-        print("Reg was succesful with user: " + name);
+        print("Reg was succesful with user: " + Name);
         LoginManager.instance.ShowCharacterScreenNew();
     }
 
+    public void LogOutUser()
+    {
+        DataManager.instance.playerData = null;
+        LoginManager.instance.ShowInitialScreen();
+        _returningPinField.text = string.Empty;
+    }
 
     public void HandleLoginUser()
     {
-        //HandleFirebase.LoginReturningUser(UserEmail, UserPassword);
+        // can we find the user in our data?
+        PlayerData returningPlayer = DataManager.instance.FoundReturningPlayer(UserPin);
+
+        if (returningPlayer != null)
+            LoginManager.instance.ShowCharacterScreen(returningPlayer);
+        else
+            myReturningForm = ReturningFormState.BadPin;
+
     }
 
     public static void SuccessfulLogin(Task<PlayerData> loadedData)
@@ -97,36 +111,33 @@ public class RegistrationFlow : MonoBehaviour
         instance._warningText.text = "Email or Password error, please try again";
         instance._loginUser.gameObject.SetActive(false);
         myReturningForm = ReturningFormState.BadPin;
-        previousEmail = email;
+
         //instance.emailBad = true;
 
     }
 
-    private void HandleValueChanged(string _)
+    private void HandleNameChanged(string _)
     {
-        ComputeState();
-    }
-
-    private void HandleValueChangedReturning(string _)
-    {
-        ComputeReturningState();
-    }
-
-
-    private void ComputeState()
-    {
-        if (!string.IsNullOrEmpty(_nameField.text))
+        if (!string.IsNullOrEmpty(Name))
         {
             myForm = FormState.Name;
             nameGood = true;
             _newUserTitle.text = $"Welcome {Name}!";
         }
-        else if (string.IsNullOrEmpty(_pinField.text))
+    }
+
+    private void HandlePinChanged(string _)
+    {
+        if (!string.IsNullOrEmpty(Pin))
         {
             myForm = FormState.Pin;
             pinGood = true;
         }
-        else if (_pinField.text != _pinFieldConfirm.text)
+    }
+
+    private void HandlePinConfirmChanged(string _)
+    {
+        if (Pin != ConfirmPin)
         {
             myForm = FormState.PinsDontMatch;
         }
@@ -137,25 +148,20 @@ public class RegistrationFlow : MonoBehaviour
             // unlock the create button
             _registerUser.gameObject.SetActive(true);
         }
-
-
     }
 
-    private void ComputeReturningState()
+    private void HandleValueChangedReturning(string _)
     {
-        if (!string.IsNullOrEmpty(_returningPinField.text))
-        {
-            myReturningForm = ReturningFormState.Pin;
-        }
-        else
+        // if we have a valid string
+        if (!string.IsNullOrEmpty(UserPin))
         {
             myReturningForm = ReturningFormState.Ok;
             _warningText.text = "";
 
             // unlock the login button
             _loginUser.gameObject.SetActive(true);
-        }
 
+        }
 
     }
 
@@ -194,6 +200,7 @@ public class RegistrationFlow : MonoBehaviour
             case ReturningFormState.BadPin:
                 {
                     _returningPinField.gameObject.GetComponent<Image>().color = redColor;
+                    _warningText.text = "Pin Not Found!";
                     break;
                 }
             case ReturningFormState.Ok:

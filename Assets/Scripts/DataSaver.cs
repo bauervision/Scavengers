@@ -21,11 +21,11 @@ public static class DataSaver
 
 
         BinaryFormatter bf = new BinaryFormatter();
-        bf.Serialize(file, DataManager.instance.playerData);
+        bf.Serialize(file, DataManager.instance.allPlayers);
         file.Close();
     }
 
-    public static PlayerData LoadFile()
+    public static AllPlayers LoadFile()
     {
         string destination = Application.persistentDataPath + "/save.dat";
         FileStream file;
@@ -38,7 +38,7 @@ public static class DataSaver
         }
 
         BinaryFormatter bf = new BinaryFormatter();
-        PlayerData data = (PlayerData)bf.Deserialize(file);
+        AllPlayers data = (AllPlayers)bf.Deserialize(file);
         file.Close();
         return data;
     }

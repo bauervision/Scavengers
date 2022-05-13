@@ -13,6 +13,7 @@ public class DataManager : MonoBehaviour
     public Image saveIcon;
 
 
+    public AllPlayers allPlayers;
     public PlayerData playerData;
 
 
@@ -44,16 +45,29 @@ public class DataManager : MonoBehaviour
 
     private void LoadSavedData()
     {
-        playerData = DataSaver.LoadFile();
+        allPlayers = DataSaver.LoadFile();
 
     }
 
 
-    public void LoadInitialData(string pin, string name)
+    public void SaveNewUserData(string pin, string name)
     {
         //TODO:load up default user data
         playerData = new PlayerData(pin, name);
+
+        // if this is our first save, create the list and add the new player
+        if (allPlayers == null)
+            allPlayers = new AllPlayers(playerData);
+        else// otherwise just add the new player
+            allPlayers.savedPlayers.Add(playerData);
+
         DataSaver.SaveFile();
+    }
+
+    public PlayerData FoundReturningPlayer(string pin)
+    {
+        return allPlayers.savedPlayers.Find(u => u.userPin == pin);
+
     }
 
 

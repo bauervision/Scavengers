@@ -4,6 +4,17 @@ using System;
 using System.Collections.Generic;
 
 [System.Serializable]
+public class AllPlayers
+{
+    public List<PlayerData> savedPlayers;
+    public AllPlayers(PlayerData newPlayer)
+    {
+        savedPlayers = new List<PlayerData>();
+        savedPlayers.Add(newPlayer);
+    }
+}
+
+[System.Serializable]
 public class PlayerData
 {
     public string userPin;

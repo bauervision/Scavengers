@@ -29,7 +29,7 @@ public class LoginManager : MonoBehaviour
     {
         instance = this;
         // check to see if we have a logged in user
-
+        initialScreen.SetActive(true);
         loginScreen.SetActive(false);
         createScreen.SetActive(false);
         characterScreen.SetActive(false);
@@ -107,7 +107,7 @@ public class LoginManager : MonoBehaviour
     public void ShowLevelScreen()
     {
         levelScreen.SetActive(true);
-        LevelLoader.SetAvailableLevels();// trigger the available levels look up from player data
+        LevelLoader.instance.SetAvailableLevels();// trigger the available levels look up from player data
         characterScreen.SetActive(false);
         characterScreenNew.SetActive(false);
     }

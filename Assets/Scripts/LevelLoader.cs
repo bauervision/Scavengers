@@ -51,27 +51,27 @@ public class LevelLoader : MonoBehaviour
         // Level_10.onClick.AddListener(PlayLevel10);
     }
 
-    public static void SetAvailableLevels()
+    public void SetAvailableLevels()
     {
-        // if (HandleFirebase.instance.thisPlayer != null)
-        // {
-        //     var currentAvailable = HandleFirebase.instance.thisPlayer.availableLevels;
-
-        for (int i = 0; i < instance.buttonList.Length; i++)
+        if (DataManager.instance.playerData != null)
         {
-            // // set the availability of the level button
-            // instance.buttonList[i].interactable = currentAvailable[i].available;
-            // // set the level name of the button
-            // instance.buttonList[i].transform.GetChild(1).GetComponent<Text>().text = currentAvailable[i].name;
-            // // set the stars, by grabbing the "stars" gameobject
-            // GameObject starsObj = instance.buttonList[i].transform.GetChild(3).gameObject;
-            // // now run through each of its children, the stars, and set their state
-            // starsObj.transform.GetChild(0).GetComponent<Image>().sprite = currentAvailable[i].hasCompleted ? instance.foundSprite : instance.defaultSprite;
-            // starsObj.transform.GetChild(1).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal1 ? instance.foundSprite : instance.defaultSprite;
-            // starsObj.transform.GetChild(2).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal2 ? instance.foundSprite : instance.defaultSprite;
+            var currentAvailable = DataManager.instance.playerData.availableLevels;
 
+            for (int i = 0; i < instance.buttonList.Length; i++)
+            {
+                // set the availability of the level button
+                instance.buttonList[i].interactable = currentAvailable[i].available;
+                // set the level name of the button
+                instance.buttonList[i].transform.GetChild(1).GetComponent<Text>().text = levelNames[i];
+                // set the stars, by grabbing the "stars" gameobject
+                GameObject starsObj = instance.buttonList[i].transform.GetChild(3).gameObject;
+                // now run through each of its children, the stars, and set their state
+                starsObj.transform.GetChild(0).GetComponent<Image>().sprite = currentAvailable[i].hasCompleted ? instance.foundSprite : instance.defaultSprite;
+                starsObj.transform.GetChild(1).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal1 ? instance.foundSprite : instance.defaultSprite;
+                starsObj.transform.GetChild(2).GetComponent<Image>().sprite = currentAvailable[i].foundCrystal2 ? instance.foundSprite : instance.defaultSprite;
+
+            }
         }
-        // }
 
 
     }
