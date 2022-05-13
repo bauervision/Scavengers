@@ -21,24 +21,15 @@ public class DataManager : MonoBehaviour
     {
         instance = this;
         //print(Application.persistentDataPath);
-        // on start, check to see if we have saved data we need to load
         if (DataSaver.CheckFirstTimeData())
-        {
-            print("Save file detected! Loading Data...");
             LoadSavedData();
-        }
         else
-        {
-            print("No file detected, Loading Default Data...");
             ContinueButton.SetActive(false);
-
-        }
     }
 
-    ///<summary>Called from the UI: save button </smmary>
+    /// <summary> Called from the UI: save button </smmary>
     public void SaveData()
     {
-        print("Saving file...");
         DataSaver.SaveFile();
 
     }
@@ -52,7 +43,6 @@ public class DataManager : MonoBehaviour
 
     public void SaveNewUserData(string pin, string name)
     {
-        //TODO:load up default user data
         playerData = new PlayerData(pin, name);
 
         // if this is our first save, create the list and add the new player
@@ -66,7 +56,8 @@ public class DataManager : MonoBehaviour
 
     public PlayerData FoundReturningPlayer(string pin)
     {
-        return allPlayers.savedPlayers.Find(u => u.userPin == pin);
+        playerData = allPlayers.savedPlayers.Find(u => u.userPin == pin);
+        return playerData;
 
     }
 

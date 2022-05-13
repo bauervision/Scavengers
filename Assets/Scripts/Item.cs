@@ -156,7 +156,7 @@ public class Item : MonoBehaviour
             message = "Great job! Now just locate the heart of the island!";
             Notificatons.ShowNotification(message, baseDuration);
             guideMessage = "You have found the mysyterious Mountain Blood, now you are trying to locate the heart of the island.  See if you can find anything similiar to the Mountain Blood around the island. Maybe...the same color, or texture...";
-            Guide.UpdateGuide(guideMessage);
+            Guide.instance.UpdateGuide(guideMessage);
             InteractionManager.DisableHalo();
         }
         if (myType == ItemType.IslandHeart)
@@ -164,7 +164,7 @@ public class Item : MonoBehaviour
             if (InteractionManager.foundMountainBlood)
             {
                 guideMessage = "At last! You have found the Island Heart and the Mountain Blood! Before you enter the heart, be sure that you are done with the island. Is there anything else you might like to find before you leave?";
-                Guide.UpdateGuide(guideMessage);
+                Guide.instance.UpdateGuide(guideMessage);
             }
         }
         if (myType == ItemType.Gem)//certain items have an array of messages to display
@@ -205,7 +205,7 @@ public class Item : MonoBehaviour
             else
                 guideMessage = "You are still exploring and have yet to locate the Mountain Blood, but collecting items like this will go a long way to boost your experience, keep looking everywhere!";
 
-            Guide.UpdateGuide(guideMessage); ;
+            Guide.instance.UpdateGuide(guideMessage); ;
         }
         else if ((myType != ItemType.IslandHeart) && (myType != ItemType.Main))
         {

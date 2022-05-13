@@ -22,7 +22,7 @@ public class InteractionManager : MonoBehaviour
 
 
     #region FindTheseItemsDuringAwake
-    private Text SeedCountText;
+    public Text SeedCountText;
     private GameObject testCharacter;
     private GameObject testController;
     private GameObject[] spawnLocations;
@@ -144,7 +144,7 @@ public class InteractionManager : MonoBehaviour
         notifyPanel = GameObject.Find("NotifyPanel");
         finalSpecialPanel = GameObject.Find("FinalSpecialText");
         // set this before we disable the throw button
-        SeedCountText = GameObject.Find("SeedCount").GetComponent<Text>();
+
         throwButton = GameObject.Find("ShroomLauncher");
         GoodieBag = GameObject.Find("GoodieBag");
         GoodieBagResult = GameObject.Find("GoodieResult");

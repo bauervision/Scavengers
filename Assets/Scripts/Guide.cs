@@ -4,18 +4,21 @@ using UnityEngine.UI;
 public class Guide : MonoBehaviour
 {
 
+    public static Guide instance;
     private GameObject guideBook;
     private GameObject profilePage;
 
-    private static Text guideUpdateText;
+    public Text guideUpdateText;
     private bool showGuide;
     private bool showProfile;
 
     private void Awake()
     {
+        instance = this;
+
         guideBook = GameObject.Find("Guide");
         profilePage = GameObject.Find("ProfilePage");
-        guideUpdateText = GameObject.Find("GuideUpdate").GetComponent<Text>();
+
 
     }
 
@@ -25,7 +28,7 @@ public class Guide : MonoBehaviour
         profilePage.SetActive(false);
     }
 
-    public static void UpdateGuide(string message)
+    public void UpdateGuide(string message)
     {
         guideUpdateText.text = message;
     }

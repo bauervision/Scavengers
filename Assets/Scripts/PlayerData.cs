@@ -19,7 +19,6 @@ public class PlayerData
 {
     public string userPin;
     public string name;
-    public string email;
     public int rank;//save as int to convert to Ranking later
     public string rankString;
     public double XP;
